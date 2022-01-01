@@ -2,15 +2,32 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"sejuta-cita/app/helpers"
 	"sejuta-cita/app/models"
+	"sejuta-cita/app/requests"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gookit/validate"
 )
 
 func UserRegister(c *fiber.Ctx) error {
 	var user models.User
+
+	p := new(requests.RegisterForm)
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Something went wrong",
+		})
+	}
+	v := validate.Struct(p)
+	if !v.Validate() {
+		return c.JSON(fiber.Map{
+			"message": v.Errors.One(),
+		})
+	}
 
 	txtPassword := c.FormValue("password")
 
@@ -23,43 +40,48 @@ func UserRegister(c *fiber.Ctx) error {
 	user.Name = c.FormValue("name")
 	user.Password = hashPassword
 
-	if user.Email == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "email is required"})
-	}
-	if user.Name == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
-	}
-
 	result, err := models.UserRegister(&user)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(map[string]string{"message": "something went wrong!"})
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Something went wrong",
+		})
 	}
 	return c.Status(result.Status).JSON(result)
 }
 
 func UserLogin(c *fiber.Ctx) error {
-	email := c.FormValue("email")
-	txtUnHashPassword := c.FormValue("password")
-
-	if email == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "email tidak boleh kosong"})
+	p := new(requests.LoginForm)
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Something went wrong",
+		})
 	}
-	if txtUnHashPassword == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "password tidak boleh kosong"})
+	v := validate.Struct(p)
+	if !v.Validate() {
+		return c.JSON(fiber.Map{
+			"message": v.Errors.One(),
+		})
 	}
 
-	isExist, isMatch, tokenString, err := models.CheckLogin(email, txtUnHashPassword)
+	isExist, isMatch, tokenString, err := models.CheckLogin(p.Email, p.Password)
 	if !isExist {
-		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "user not registered"})
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "user not registered",
+		})
 	}
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(map[string]string{"message": "something went wrong!"})
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "something went wrong",
+		})
 	}
 	if !isMatch {
-		return c.Status(http.StatusUnauthorized).JSON(map[string]string{"message": "Password salah"})
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
+			"message": "password is incorrect",
+		})
 	}
 
-	return c.Status(http.StatusOK).JSON(map[string]string{
+	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"token": tokenString,
 	})
 }

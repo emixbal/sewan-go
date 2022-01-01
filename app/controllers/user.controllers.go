@@ -19,7 +19,9 @@ func ShowUserDetail(c *fiber.Ctx) error {
 	_, err := strconv.Atoi(user_id)
 	if err != nil {
 		log.Println(err)
-		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "invalid user id"})
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
+			"message": "invalid user id",
+		})
 	}
 	result, _ := models.ShowUserDetail(user_id)
 	return c.Status(result.Status).JSON(result)
@@ -32,10 +34,14 @@ func CreateUser(c *fiber.Ctx) error {
 	user.Email = c.FormValue("email")
 
 	if user.Name == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "name is required",
+		})
 	}
 	if user.Email == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "no_isbn is required"})
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "email is required",
+		})
 	}
 
 	result, _ := models.CreateAUser(&user)

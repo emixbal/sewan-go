@@ -8,8 +8,8 @@ import (
 )
 
 func Book(app *fiber.App) {
-	user := app.Group("/books")
+	r := app.Group("/books")
 
-	user.Get("/", middlewares.ExampleMiddleware, controllers.FetchAllBooks) // contoh menggunakan middleware
-	user.Post("/", controllers.CreateBook)
+	r.Get("/", middlewares.ExampleMiddleware, controllers.FetchAllBooks) // contoh menggunakan middleware
+	r.Post("/", controllers.CreateBook)
 }

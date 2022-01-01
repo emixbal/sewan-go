@@ -25,7 +25,7 @@ COPY ./static ./static
 
 # `sejuta-cita` should be replaced here as well
 COPY --from=build /go/src/sejuta-cita/app .
-COPY --from=build /go/src/sejuta-cita/.env .
+# COPY --from=build /go/src/sejuta-cita/.env .
 
 # Exposes port 3000 because our program listens on that port
 EXPOSE 3000

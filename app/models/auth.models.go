@@ -59,22 +59,22 @@ func UserUpdate(user *User) (Response, error) {
 	return res, nil
 }
 
-func CheckLogin(email, passwordTxt string) (bool, bool, string, error) {
+func CheckLogin(email, passwordTxt string) (isExist bool, isMatch bool, tokenString string, userObj User, errMessage error) {
 	var user User
 	db := config.GetDBInstance()
 
 	if result := db.Where(&User{Email: email}).First(&user); result.Error != nil {
 		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
-			return false, false, "", result.Error
+			return false, false, "", user, result.Error
 		}
 
 		fmt.Print(result.Error)
-		return true, false, "", result.Error
+		return true, false, "", user, result.Error
 	}
 
 	match, _ := helpers.CheckPasswordHash(user.Password, passwordTxt)
 	if !match {
-		return true, false, "", nil
+		return true, false, "", user, nil
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -89,5 +89,5 @@ func CheckLogin(email, passwordTxt string) (bool, bool, string, error) {
 		fmt.Println(err)
 	}
 
-	return true, true, tokenString, nil
+	return true, true, tokenString, user, nil
 }

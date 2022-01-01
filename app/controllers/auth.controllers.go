@@ -62,7 +62,7 @@ func UserLogin(c *fiber.Ctx) error {
 		})
 	}
 
-	isExist, isMatch, tokenString, err := models.CheckLogin(p.Email, p.Password)
+	isExist, isMatch, tokenString, user, err := models.CheckLogin(p.Email, p.Password)
 	if !isExist {
 		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "user not registered",
@@ -81,6 +81,11 @@ func UserLogin(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON(fiber.Map{
 		"token": tokenString,
+		"user": fiber.Map{
+			"id":       user.ID,
+			"email":    user.Email,
+			"is_admin": user.IsAdmin,
+		},
 	})
 }
 

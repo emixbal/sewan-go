@@ -10,8 +10,10 @@ import (
 
 type User struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	IsAdmin  bool   `json:"is_admin,omitempty" gorm:"default:false"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func FethAllUsers() (Response, error) {

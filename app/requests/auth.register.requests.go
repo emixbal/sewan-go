@@ -19,8 +19,8 @@ func (f RegisterForm) Messages() map[string]string {
 // Translates you can custom field translates.
 func (f RegisterForm) Translates() map[string]string {
 	return validate.MS{
-		"Email":    "Email",
-		"Name":     "Name",
-		"Password": "Password",
+		"Email":    "email",
+		"Name":     "name",
+		"Password": "password",
 	}
 }

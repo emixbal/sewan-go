@@ -1,12 +1,16 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"sejuta-cita/app/helpers"
 	"sejuta-cita/app/models"
+	"sejuta-cita/app/requests"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gookit/validate"
 )
 
 func FetchAllUsers(c *fiber.Ctx) error {
@@ -27,23 +31,49 @@ func ShowUserDetail(c *fiber.Ctx) error {
 	return c.Status(result.Status).JSON(result)
 }
 
-func CreateUser(c *fiber.Ctx) error {
+func UserSoftDelete(c *fiber.Ctx) error {
+	result, _ := models.UserSoftDelete(c.Params("id"))
+
+	return c.Status(200).JSON(result)
+}
+
+func UserHardDelete(c *fiber.Ctx) error {
+	result, _ := models.UserHardDelete(c.Params("id"))
+
+	return c.Status(200).JSON(result)
+}
+
+func UserUpdate(c *fiber.Ctx) error {
 	var user models.User
 
-	user.Name = c.FormValue("name")
-	user.Email = c.FormValue("email")
-
-	if user.Name == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": "name is required",
+	p := new(requests.RegisterForm)
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Something went wrong",
 		})
 	}
-	if user.Email == "" {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": "email is required",
+	v := validate.Struct(p)
+	if !v.Validate() {
+		return c.JSON(fiber.Map{
+			"message": v.Errors.One(),
 		})
 	}
 
-	result, _ := models.CreateAUser(&user)
+	hashPassword, err := helpers.GeneratePassword(p.Password)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	user.Email = p.Email
+	user.Name = p.Name
+	user.Password = hashPassword
+
+	result, err := models.UserUpdate(&user)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Something went wrong",
+		})
+	}
 	return c.Status(result.Status).JSON(result)
 }

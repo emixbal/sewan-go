@@ -28,4 +28,13 @@ func User(app *fiber.App) {
 	IsAdmin.Post("/new",
 		controllers.UserRegister,
 	)
+	IsAdmin.Delete("/:id",
+		controllers.UserSoftDelete,
+	)
+	IsAdmin.Delete("/:id/force",
+		controllers.UserHardDelete,
+	)
+	IsAdmin.Put("/:id",
+		controllers.UserUpdate,
+	)
 }

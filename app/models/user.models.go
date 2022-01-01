@@ -13,6 +13,7 @@ type User struct {
 	gorm.Model
 	Name     string `json:"name"`
 	IsAdmin  bool   `json:"is_admin,omitempty" gorm:"default:false"`
+	IsActive bool   `json:"is_active,omitempty" gorm:"default:true"`
 	Email    string `json:"email" gorm:"index:idx_name,unique"`
 	Password string `json:"-"`
 }
@@ -23,7 +24,7 @@ func FethAllUsers() (Response, error) {
 
 	db := config.GetDBInstance()
 
-	if result := db.Find(&users); result.Error != nil {
+	if result := db.Where("is_active = ?", true).Find(&users); result.Error != nil {
 		fmt.Print("error FethAllUsers")
 		fmt.Print(result.Error)
 
@@ -44,7 +45,7 @@ func ShowUserDetail(user_id string) (Response, error) {
 	var user User
 	db := config.GetDBInstance()
 
-	result := db.First(&user, user_id)
+	result := db.Where("is_active = ?", true).First(&user, user_id)
 	if result.Error != nil {
 		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
 			res.Status = http.StatusOK
@@ -79,6 +80,61 @@ func CreateAUser(user *User) (Response, error) {
 	res.Status = http.StatusOK
 	res.Message = "success"
 	res.Data = user
+
+	return res, nil
+}
+
+func UserSoftDelete(user_id string) (Response, error) {
+	var res Response
+	var user User
+
+	db := config.GetDBInstance()
+	result := db.First(&user, user_id)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "Something went wrong!"
+		return res, result.Error
+	}
+
+	if !user.IsActive {
+		res.Status = http.StatusOK
+		res.Message = "user already inactive"
+
+		return res, nil
+	}
+
+	user.IsActive = false
+
+	db.Save(&user)
+
+	res.Status = http.StatusOK
+	res.Message = "Success"
+	res.Data = user
+
+	return res, nil
+}
+
+func UserHardDelete(user_id string) (Response, error) {
+	var res Response
+	var user User
+
+	db := config.GetDBInstance()
+	result := db.Unscoped().Delete(&user, user_id)
+
+	if result.Error != nil {
+		res.Status = http.StatusInternalServerError
+		res.Message = "Error"
+
+		return res, result.Error
+	}
+	res.Status = http.StatusOK
+	res.Message = "Success"
 
 	return res, nil
 }

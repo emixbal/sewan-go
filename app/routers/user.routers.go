@@ -8,6 +8,7 @@ import (
 )
 
 func User(app *fiber.App) {
+	// need login access (regular users)
 	IsAuthenticated := app.Group("/user",
 		middlewares.IsAuthenticated,
 	)
@@ -16,6 +17,11 @@ func User(app *fiber.App) {
 		controllers.FetchAllUsers,
 	)
 
+	IsAuthenticated.Get("/:user_id",
+		controllers.ShowUserDetail,
+	)
+
+	// need admin access
 	IsAdmin := IsAuthenticated.Group("/",
 		middlewares.IsAdmin,
 	)

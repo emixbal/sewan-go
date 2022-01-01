@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"sejuta-cita/config"
@@ -13,17 +14,17 @@ type User struct {
 	Name     string `json:"name"`
 	IsAdmin  bool   `json:"is_admin,omitempty" gorm:"default:false"`
 	Email    string `json:"email" gorm:"index:idx_name,unique"`
-	Password string `json:"password"`
+	Password string `json:"-"`
 }
 
 func FethAllUsers() (Response, error) {
-	var books []Book
+	var users []User
 	var res Response
 
 	db := config.GetDBInstance()
 
-	if result := db.Find(&books); result.Error != nil {
-		fmt.Print("error FethAllBooks")
+	if result := db.Find(&users); result.Error != nil {
+		fmt.Print("error FethAllUsers")
 		fmt.Print(result.Error)
 
 		res.Status = http.StatusInternalServerError
@@ -33,17 +34,41 @@ func FethAllUsers() (Response, error) {
 
 	res.Status = http.StatusOK
 	res.Message = "success"
-	res.Data = books
+	res.Data = users
 
 	return res, nil
 }
 
-func CreateAUser(book *User) (Response, error) {
+func ShowUserDetail(user_id string) (Response, error) {
+	var res Response
+	var user User
+	db := config.GetDBInstance()
+
+	result := db.First(&user, user_id)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "Something went wrong!"
+		return res, result.Error
+	}
+	res.Status = http.StatusOK
+	res.Message = "Success"
+	res.Data = user
+
+	return res, nil
+}
+
+func CreateAUser(user *User) (Response, error) {
 	var res Response
 	db := config.GetDBInstance()
 
-	if result := db.Create(&book); result.Error != nil {
-		fmt.Print("error CreateABook")
+	if result := db.Create(&user); result.Error != nil {
+		fmt.Print("error CreateAUser")
 		fmt.Print(result.Error)
 
 		res.Status = http.StatusInternalServerError
@@ -53,7 +78,7 @@ func CreateAUser(book *User) (Response, error) {
 
 	res.Status = http.StatusOK
 	res.Message = "success"
-	res.Data = book
+	res.Data = user
 
 	return res, nil
 }

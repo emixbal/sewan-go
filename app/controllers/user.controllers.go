@@ -1,14 +1,27 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"sejuta-cita/app/models"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func FetchAllUsers(c *fiber.Ctx) error {
 	result, _ := models.FethAllUsers()
+	return c.Status(result.Status).JSON(result)
+}
+
+func ShowUserDetail(c *fiber.Ctx) error {
+	user_id := c.Params("user_id")
+	_, err := strconv.Atoi(user_id)
+	if err != nil {
+		log.Println(err)
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "invalid user id"})
+	}
+	result, _ := models.ShowUserDetail(user_id)
 	return c.Status(result.Status).JSON(result)
 }
 

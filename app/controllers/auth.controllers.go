@@ -29,15 +29,13 @@ func UserRegister(c *fiber.Ctx) error {
 		})
 	}
 
-	txtPassword := c.FormValue("password")
-
-	hashPassword, err := helpers.GeneratePassword(txtPassword)
+	hashPassword, err := helpers.GeneratePassword(p.Password)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	user.Email = c.FormValue("email")
-	user.Name = c.FormValue("name")
+	user.Email = p.Email
+	user.Name = p.Name
 	user.Password = hashPassword
 
 	result, err := models.UserRegister(&user)

@@ -8,8 +8,18 @@ import (
 )
 
 func User(app *fiber.App) {
-	r := app.Group("/user")
+	IsAuthenticated := app.Group("/user",
+		middlewares.IsAuthenticated,
+	)
 
-	r.Get("/", middlewares.ExampleMiddleware, controllers.FetchAllUsers) // contoh menggunakan middleware
-	r.Post("/", controllers.CreateUser)
+	IsAuthenticated.Get("/all",
+		controllers.FetchAllUsers,
+	)
+
+	IsAdmin := IsAuthenticated.Group("/",
+		middlewares.IsAdmin,
+	)
+	IsAdmin.Post("/new",
+		controllers.UserRegister,
+	)
 }

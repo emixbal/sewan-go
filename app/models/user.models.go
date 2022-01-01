@@ -12,7 +12,7 @@ type User struct {
 	gorm.Model
 	Name     string `json:"name"`
 	IsAdmin  bool   `json:"is_admin,omitempty" gorm:"default:false"`
-	Email    string `json:"email"`
+	Email    string `json:"email" gorm:"index:idx_name,unique"`
 	Password string `json:"password"`
 }
 

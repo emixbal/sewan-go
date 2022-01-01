@@ -11,13 +11,15 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func UserRegister(user *User) (Response, error) {
 	var res Response
 	db := config.GetDBInstance()
 
-	if result := db.Create(&user); result.Error != nil {
+	result := db.Clauses(clause.OnConflict{DoNothing: true}).Create(&user)
+	if result.Error != nil {
 		fmt.Print("error CreateABook")
 		fmt.Print(result.Error)
 

@@ -50,9 +50,7 @@ func UserLogin(c *fiber.Ctx) error {
 
 	isExist, isMatch, tokenString, err := models.CheckLogin(email, txtUnHashPassword)
 	if !isExist {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"message": "user not registered",
-		})
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "user not registered"})
 	}
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(map[string]string{"message": "something went wrong!"})

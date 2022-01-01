@@ -21,12 +21,9 @@ func IsAuthenticated(c *fiber.Ctx) error {
 		)
 	}
 
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-		key := []byte(os.Getenv("JWT_SECRET"))
-		return key, nil
+	claims := jwt.MapClaims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -38,11 +35,34 @@ func IsAuthenticated(c *fiber.Ctx) error {
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+
+		c.Locals("user_id", claims["userId"])
+		c.Locals("user_email", claims["email"])
+
+		if claims["is_admin"] == true {
+			c.Locals("is_admin", true)
+		} else {
+			c.Locals("is_admin", false)
+		}
 		return c.Next()
 	}
+
 	return c.Status(http.StatusUnauthorized).JSON(
 		map[string]string{
 			"message": "Unauthorized, access token is invalid!",
 		},
 	)
+}
+
+func IsAdmin(c *fiber.Ctx) error {
+	if c.Locals("is_admin") == true {
+		return c.Next()
+	}
+
+	return c.Status(http.StatusUnauthorized).JSON(
+		map[string]string{
+			"message": "Unauthorized to access this menu",
+		},
+	)
+
 }

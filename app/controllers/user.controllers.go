@@ -19,6 +19,12 @@ func FetchAllUsers(c *fiber.Ctx) error {
 	offset := 0
 	if c.Query("per_page") != "" {
 		limit, _ = strconv.Atoi(c.Query("per_page"))
+		if limit > 50 {
+			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+				"message": "too much data to show",
+			})
+
+		}
 	}
 	if c.Query("per_page") != "" {
 		offset, _ = strconv.Atoi(c.Query("page"))

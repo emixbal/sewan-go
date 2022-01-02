@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"sejuta-cita/app/helpers"
 	"sejuta-cita/app/models"
 	"sejuta-cita/app/requests"
 	"strconv"
@@ -32,13 +34,13 @@ func ShowUserDetail(c *fiber.Ctx) error {
 func UserSoftDelete(c *fiber.Ctx) error {
 	result, _ := models.UserSoftDelete(c.Params("id"))
 
-	return c.Status(200).JSON(result)
+	return c.Status(result.Status).JSON(result)
 }
 
 func UserHardDelete(c *fiber.Ctx) error {
 	result, _ := models.UserHardDelete(c.Params("id"))
 
-	return c.Status(200).JSON(result)
+	return c.Status(result.Status).JSON(result)
 }
 
 func UserUpdate(c *fiber.Ctx) error {
@@ -65,5 +67,64 @@ func UserUpdate(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(result)
 	}
+	return c.Status(result.Status).JSON(result)
+}
+
+func NewPasswordSelf(c *fiber.Ctx) error {
+	user_id_interface := c.Locals("user_id")
+	user_id := fmt.Sprintf("%v", user_id_interface)
+
+	p := new(requests.UserUpdatePasswordForm)
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Empty payloads",
+		})
+	}
+	v := validate.Struct(p)
+	if !v.Validate() {
+		return c.JSON(fiber.Map{
+			"message": v.Errors.One(),
+		})
+	}
+
+	hashPassword, err_generate_pass := helpers.GeneratePassword(p.Password)
+	if err_generate_pass != nil {
+		log.Panicln(err_generate_pass)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "something went wrong",
+		})
+	}
+
+	result, _ := models.NewPassword(user_id, hashPassword)
+	return c.Status(result.Status).JSON(result)
+}
+
+func NewPassword(c *fiber.Ctx) error {
+	user_id := c.Params("id")
+
+	p := new(requests.UserUpdatePasswordForm)
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Empty payloads",
+		})
+	}
+	v := validate.Struct(p)
+	if !v.Validate() {
+		return c.JSON(fiber.Map{
+			"message": v.Errors.One(),
+		})
+	}
+
+	hashPassword, err_generate_pass := helpers.GeneratePassword(p.Password)
+	if err_generate_pass != nil {
+		log.Panicln(err_generate_pass)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"message": "something went wrong",
+		})
+	}
+
+	result, _ := models.NewPassword(user_id, hashPassword)
 	return c.Status(result.Status).JSON(result)
 }

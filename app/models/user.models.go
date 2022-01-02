@@ -168,3 +168,32 @@ func UserHardDelete(user_id string) (Response, error) {
 
 	return res, nil
 }
+
+func NewPassword(user_id string, hashPassword string) (Response, error) {
+	var res Response
+	var user User
+
+	db := config.GetDBInstance()
+	result := db.Where("id = ?", user_id).Take(&user)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "something went wrong"
+		return res, result.Error
+	}
+
+	user.Password = hashPassword
+
+	db.Save(&user)
+
+	res.Status = http.StatusOK
+	res.Message = "success"
+	res.Data = user
+
+	return res, nil
+}

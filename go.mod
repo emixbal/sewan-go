@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/andybalholm/brotli v1.0.3 // indirect
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/gofiber/fiber/v2 v2.18.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect

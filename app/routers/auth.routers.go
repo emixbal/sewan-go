@@ -2,6 +2,7 @@ package routers
 
 import (
 	"sejuta-cita/app/controllers"
+	"sejuta-cita/app/middlewares"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,6 +12,6 @@ func Auth(app *fiber.App) {
 
 	r.Post("/login", controllers.UserLogin)
 	r.Post("/register", controllers.UserRegister)
-	// r.Post("/make_admin", controllers.CreateBook)
-	// r.Post("/remove_admin", controllers.CreateBook)
+
+	r.Post("/new-password", middlewares.IsAuthenticated, controllers.NewPasswordSelf)
 }

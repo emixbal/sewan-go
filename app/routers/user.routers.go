@@ -37,4 +37,8 @@ func User(app *fiber.App) {
 	IsAdmin.Put("/:id",
 		controllers.UserUpdate,
 	)
+	IsAdmin.Post("/new-password/:id",
+		controllers.NewPassword,
+	)
+
 }

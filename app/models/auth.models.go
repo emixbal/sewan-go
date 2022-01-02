@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"sejuta-cita/app/helpers"
@@ -23,30 +22,6 @@ func UserRegister(user *User) (Response, error) {
 	if result.Error != nil {
 		fmt.Print("error CreateAUser")
 		fmt.Print(result.Error)
-
-		res.Status = http.StatusInternalServerError
-		res.Message = "error save new record"
-		return res, result.Error
-	}
-
-	res.Status = http.StatusOK
-	res.Message = "success"
-
-	return res, nil
-}
-
-func UserUpdate(user *User) (Response, error) {
-	var res Response
-	db := config.GetDBInstance()
-
-	result := db.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "id"}},
-		DoUpdates: clause.AssignmentColumns([]string{"name", "email", "password"}),
-	}).Create(&user)
-
-	if result.Error != nil {
-		log.Println("error CreateAUser")
-		log.Println(result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error save new record"

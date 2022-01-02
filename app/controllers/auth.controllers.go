@@ -41,7 +41,7 @@ func UserRegister(c *fiber.Ctx) error {
 	result, err := models.UserRegister(&user)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Something went wrong",
+			"message": "Empty payloads",
 		})
 	}
 	return c.Status(result.Status).JSON(result)
@@ -52,7 +52,7 @@ func UserLogin(c *fiber.Ctx) error {
 	if err := c.BodyParser(p); err != nil {
 		log.Println(err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Something went wrong",
+			"message": "Empty payloads",
 		})
 	}
 	v := validate.Struct(p)

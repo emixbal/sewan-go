@@ -120,6 +120,36 @@ func UserSoftDelete(user_id string) (Response, error) {
 	return res, nil
 }
 
+func UserUpdate(user_payload *User, user_id string) (Response, error) {
+	var res Response
+	var user User
+
+	db := config.GetDBInstance()
+	result := db.Where("id = ?", user_id).Take(&user)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "something went wrong"
+		return res, result.Error
+	}
+
+	user.Email = user_payload.Email
+	user.Name = user_payload.Name
+
+	db.Save(&user)
+
+	res.Status = http.StatusOK
+	res.Message = "success"
+	res.Data = user
+
+	return res, nil
+}
+
 func UserHardDelete(user_id string) (Response, error) {
 	var res Response
 	var user User

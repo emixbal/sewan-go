@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"sejuta-cita/app/helpers"
 	"sejuta-cita/app/models"
 	"sejuta-cita/app/requests"
 	"strconv"
@@ -46,11 +44,11 @@ func UserHardDelete(c *fiber.Ctx) error {
 func UserUpdate(c *fiber.Ctx) error {
 	var user models.User
 
-	p := new(requests.RegisterForm)
+	p := new(requests.UserUpdateForm)
 	if err := c.BodyParser(p); err != nil {
 		log.Println(err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Something went wrong",
+			"message": "Empty payloads",
 		})
 	}
 	v := validate.Struct(p)
@@ -60,20 +58,12 @@ func UserUpdate(c *fiber.Ctx) error {
 		})
 	}
 
-	hashPassword, err := helpers.GeneratePassword(p.Password)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	user.Email = p.Email
 	user.Name = p.Name
-	user.Password = hashPassword
 
-	result, err := models.UserUpdate(&user)
+	result, err := models.UserUpdate(&user, c.Params("id"))
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Something went wrong",
-		})
+		return c.Status(http.StatusInternalServerError).JSON(result)
 	}
 	return c.Status(result.Status).JSON(result)
 }

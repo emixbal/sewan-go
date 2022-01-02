@@ -14,7 +14,20 @@ import (
 )
 
 func FetchAllUsers(c *fiber.Ctx) error {
-	result, _ := models.FethAllUsers()
+
+	limit := 15
+	offset := 0
+	if c.Query("per_page") != "" {
+		limit, _ = strconv.Atoi(c.Query("per_page"))
+	}
+	if c.Query("per_page") != "" {
+		offset, _ = strconv.Atoi(c.Query("page"))
+		if offset != 0 {
+			offset = offset - 1
+		}
+	}
+
+	result, _ := models.FethAllUsers(limit, offset)
 	return c.Status(result.Status).JSON(result)
 }
 

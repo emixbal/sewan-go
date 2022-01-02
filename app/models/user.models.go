@@ -18,13 +18,13 @@ type User struct {
 	Password string `json:"-"`
 }
 
-func FethAllUsers() (Response, error) {
+func FethAllUsers(limit, offset int) (Response, error) {
 	var users []User
 	var res Response
 
 	db := config.GetDBInstance()
 
-	if result := db.Where("is_active = ?", true).Find(&users); result.Error != nil {
+	if result := db.Limit(limit).Offset(offset).Where("is_active = ?", true).Find(&users); result.Error != nil {
 		fmt.Print("error FethAllUsers")
 		fmt.Print(result.Error)
 

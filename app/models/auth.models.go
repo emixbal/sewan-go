@@ -52,11 +52,20 @@ func CheckLogin(email, passwordTxt string) (isExist bool, isMatch bool, tokenStr
 		return true, false, "", user, nil
 	}
 
+	// atClaims := jwt.MapClaims{}
+	// atClaims["authorized"] = true
+	// atClaims["user_id"] = user.ID
+	// atClaims["email"] = user.Email
+	// atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	// at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
+	// tokenString, err := at.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":    email,
 		"user_id":  user.ID,
 		"is_admin": user.IsAdmin,
-		"nbf":      time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
+		"exp":      time.Now().Add(time.Minute * 15).Unix(),
+		"iat":      time.Now().Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))

@@ -54,7 +54,7 @@ func CheckLogin(email, passwordTxt string) (isExist bool, isMatch bool, tokenStr
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email":    email,
-		"userId":   user.ID,
+		"user_id":  user.ID,
 		"is_admin": user.IsAdmin,
 		"nbf":      time.Date(2015, 10, 10, 12, 0, 0, 0, time.UTC).Unix(),
 	})

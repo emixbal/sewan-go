@@ -9,14 +9,17 @@ import (
 	"sejuta-cita/config"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/gookit/validate"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtRefreshKey = []byte(os.Getenv("REFRESH_SECRET"))
+var refreshSecret = []byte(os.Getenv("REFRESH_SECRET"))
 
 func LoginRefrehToken(c *fiber.Ctx) error {
+	var userClaim models.UserClaim
+
 	p := new(requests.LoginForm)
 	if err := c.BodyParser(p); err != nil {
 		return err
@@ -44,16 +47,25 @@ func LoginRefrehToken(c *fiber.Ctx) error {
 			"message": "Password is incorrect!",
 		})
 	}
-
-	accessToken, refreshToken := models.GenerateTokens(u.Email)
+	userClaim.Issuer = utils.UUIDv4()
+	userClaim.Id = int(u.ID)
+	userClaim.Email = u.Email
+	accessToken, refreshToken := models.GenerateTokens(&userClaim, false)
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"user": fiber.Map{
+			"id":       u.ID,
+			"email":    u.Email,
+			"is_admin": u.IsAdmin,
+		},
 	})
 }
 
 func RefreshToken(c *fiber.Ctx) error {
+	var userClaim models.UserClaim
+
 	refreshToken := c.FormValue("refresh_token")
 
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
@@ -61,28 +73,42 @@ func RefreshToken(c *fiber.Ctx) error {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return jwtRefreshKey, nil
+		return refreshSecret, nil
 	})
 
 	if err != nil {
 		fmt.Println("the error from parse: ", err)
-		return c.Status(500).JSON(fiber.Map{"message": err})
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"message": err})
 	}
 
 	//is token valid?
-	_, ok := token.Claims.(jwt.Claims)
-
+	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return c.Status(http.StatusOK).JSON(fiber.Map{
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
 			"message": "StatusUnauthorized",
 		})
 	}
 
-	claims, _ := token.Claims.(jwt.MapClaims) //the token claims should conform to MapClaims
+	user_id := claims["user_id"]
+	user_id_int := int(user_id.(float64))
+	userClaim.Issuer = fmt.Sprintf("%v", claims["issuer"])
+	userClaim.Id = user_id_int
+	userClaim.Email = fmt.Sprintf("%v", claims["email"])
+	if claims["is_admin"] == true {
+		userClaim.IsAdmin = true
+	} else {
+		userClaim.IsAdmin = false
+	}
 
-	fmt.Println(claims)
+	accessToken, refreshToken := models.GenerateTokens(&userClaim, true)
 
-	return c.Status(http.StatusOK).JSON(fiber.Map{
-		"message": "StatusUnauthorized",
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+		"user": fiber.Map{
+			"id":       userClaim.Id,
+			"email":    userClaim.Email,
+			"is_admin": userClaim.IsAdmin,
+		},
 	})
 }

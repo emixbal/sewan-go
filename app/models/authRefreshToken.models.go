@@ -2,40 +2,46 @@ package models
 
 import (
 	"os"
-	"sejuta-cita/config"
 	"time"
 
+	"github.com/gofiber/fiber/v2/utils"
 	"github.com/golang-jwt/jwt"
 )
 
-// Claims represent the structure of the JWT token
-type Claims struct {
-	jwt.StandardClaims
-	ID uint `gorm:"primaryKey"`
+type UserClaim struct {
+	Issuer  string
+	Id      int
+	Email   string
+	IsAdmin bool
 }
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
-var jwtRefreshKey = []byte(os.Getenv("REFRESH_SECRET"))
+var (
+	jwtKey        = []byte(os.Getenv("JWT_SECRET"))
+	jwtRefreshKey = []byte(os.Getenv("REFRESH_SECRET"))
+)
 
 // GenerateTokens returns the access and refresh tokens
-func GenerateTokens(email string) (string, string) {
-	claim, accessToken := GenerateAccessClaims(email)
-	refreshToken := GenerateRefreshClaims(claim)
+func GenerateTokens(userClaim *UserClaim, isDoRefresh bool) (string, string) {
+	issuer := userClaim.Issuer
+	if isDoRefresh {
+		issuer = utils.UUIDv4()
+	}
+
+	accessToken := GenerateAccessClaims(userClaim, issuer)
+	refreshToken := GenerateRefreshClaims(userClaim, issuer)
 
 	return accessToken, refreshToken
 }
 
 // GenerateAccessClaims returns a claim and a acess_token string
-func GenerateAccessClaims(email string) (*Claims, string) {
-
-	t := time.Now()
-	claim := &Claims{
-		StandardClaims: jwt.StandardClaims{
-			Issuer:    email,
-			ExpiresAt: t.Add(15 * time.Minute).Unix(),
-			Subject:   "access_token",
-			IssuedAt:  t.Unix(),
-		},
+func GenerateAccessClaims(userClaim *UserClaim, issuer string) string {
+	claim := &jwt.MapClaims{
+		"issuer":   issuer,
+		"email":    userClaim.Email,
+		"user_id":  userClaim.Id,
+		"is_admin": userClaim.IsAdmin,
+		"exp":      time.Now().Add(time.Minute * 15).Unix(),
+		"iat":      time.Now().Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
@@ -44,39 +50,19 @@ func GenerateAccessClaims(email string) (*Claims, string) {
 		panic(err)
 	}
 
-	return claim, tokenString
+	return tokenString
 }
 
 // GenerateRefreshClaims returns refresh_token
-func GenerateRefreshClaims(cl *Claims) string {
-	db := config.GetDBInstance()
-
-	result := db.Where(&Claims{
-		StandardClaims: jwt.StandardClaims{
-			Issuer: cl.Issuer,
-		},
-	}).Find(&Claims{})
-
-	// checking the number of refresh tokens stored.
-	// If the number is higher than 3, remove all the refresh tokens and leave only new one.
-	if result.RowsAffected > 3 {
-		db.Where(&Claims{
-			StandardClaims: jwt.StandardClaims{Issuer: cl.Issuer},
-		}).Delete(&Claims{})
+func GenerateRefreshClaims(userClaim *UserClaim, issuer string) string {
+	refreshClaim := &jwt.MapClaims{
+		"issuer":   issuer,
+		"email":    userClaim.Email,
+		"user_id":  userClaim.Id,
+		"is_admin": userClaim.IsAdmin,
+		"exp":      time.Now().Add(30 * 24 * time.Hour).Unix(),
+		"iat":      time.Now().Unix(),
 	}
-
-	t := time.Now()
-	refreshClaim := &Claims{
-		StandardClaims: jwt.StandardClaims{
-			Issuer:    cl.Issuer,
-			ExpiresAt: t.Add(30 * 24 * time.Hour).Unix(),
-			Subject:   "refresh_token",
-			IssuedAt:  t.Unix(),
-		},
-	}
-
-	// create a claim on DB
-	db.Create(&refreshClaim)
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaim)
 	refreshTokenString, err := refreshToken.SignedString(jwtRefreshKey)

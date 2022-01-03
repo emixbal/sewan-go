@@ -9,6 +9,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
+var (
+	jwtKey = []byte(os.Getenv("JWT_SECRET"))
+)
+
 func IsAuthenticated(c *fiber.Ctx) error {
 	raw_token := c.Request().Header.Peek("Authorization")
 	tokenString := string(raw_token)
@@ -23,7 +27,7 @@ func IsAuthenticated(c *fiber.Ctx) error {
 
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return jwtKey, nil
 	})
 	if err != nil {
 		fmt.Println(err)

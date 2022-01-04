@@ -1,10 +1,13 @@
 package middlewares
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -39,6 +42,24 @@ func IsAuthenticated(c *fiber.Ctx) error {
 	}
 
 	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+
+		// set token to blacklist in redis
+		// rdb := config.GetDBInstanceRedis()
+		rdb := redis.NewClient(&redis.Options{
+			Addr:     "localhost:6379",
+			Password: "", // no password set
+			DB:       0,  // use default DB
+		})
+
+		issuer := fmt.Sprintf("%v", claims["issuer"])
+		var ctx = context.TODO()
+		val, errrdb := rdb.Get(ctx, issuer).Result()
+		if errrdb != nil {
+			log.Println("====>redis err read blacklist token<===")
+			log.Println(errrdb)
+		}
+
+		fmt.Println("val>>>>>", val)
 
 		c.Locals("user_id", claims["user_id"])
 		c.Locals("user_email", claims["email"])

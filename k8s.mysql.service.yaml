@@ -1,0 +1,13 @@
+apiVersion: v1                           # API version
+kind: Service                            # Type of kubernetes resource 
+metadata:
+  name: sejuta-cita-mysql                  # Name of the resource
+  labels:                                # Labels that will be applied to the resource
+    app: sejuta-cita-mysql
+spec:
+  type: NodePort
+  ports:
+    - port: 3306
+  selector:                              # Selects any Pod with labels `app=sejuta-cita-mysql,tier=mysql`
+    app: sejuta-cita-mysql
+    tier: mysql 

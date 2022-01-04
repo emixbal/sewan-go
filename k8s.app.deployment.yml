@@ -22,14 +22,16 @@ spec:
           - name: DB_DRIVER
             value: "mysql"
           - name: DB_USERNAME
-            value: "root"
+            value: "sejutacita_api_user"
           - name: DB_PASSWORD
-            value: "root"
+            value: "sejutacita_api123"
           - name: DB_PORT
             value: "3306"
           - name: DB_HOST
-            value: "192.168.0.107"
+            value: "sejutacita-mysql"
           - name: DB_NAME
-            value: "sejuta-cita"
+            value: "sejutacita_apidb"
           - name: REDIS_DSN
             value: "192.168.0.107:6379"
+          - name: API_SECRET
+            value: "98hbun98h"

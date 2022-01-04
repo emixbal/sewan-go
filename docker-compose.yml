@@ -1,11 +1,11 @@
 version: '3'
 services:
   app:
-    container_name: sejuta-cita_app
+    container_name: sejuta_cita_app
     restart: unless-stopped
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: go.dockerfile
     ports:
       - 3000:3000
     volumes:

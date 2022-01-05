@@ -38,10 +38,16 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
 	```
  3. **Check services dan pods apakah sukses?**
     - Menampilkan semua services
-        ```$ kubectl get services```
-        ```$ kubectl get pods```  
+        ```
+        $ kubectl get services
+        ```
+        ```
+        $ kubectl get pods
+        ```  
     - karena menggunkan minikube harus set external ip secarea manual
-        ```$ kubectl service sejuta-cita-service --url```
+        ```
+        $ kubectl service sejuta-cita-service --url
+        ```
         atau menngunakan minikube tunnel
  6. Set url yg muncul sebagai baseUrl
 

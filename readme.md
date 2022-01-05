@@ -41,13 +41,17 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
         ```
         $ kubectl get services
         ```
+        ![all service](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/services%20all.png)
+        
         ```
         $ kubectl get pods
         ```  
+        ![all pods](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/pods%20all.png)
     - karena menggunkan minikube harus set external ip secarea manual
         ```
         $ kubectl service sejuta-cita-service --url
         ```
+        ![all pods](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/services%20generate%20url.png)
         atau menngunakan minikube tunnel
  6. **Set url yg muncul sebagai baseUrl**
 

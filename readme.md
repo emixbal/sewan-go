@@ -49,5 +49,5 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
         $ kubectl service sejuta-cita-service --url
         ```
         atau menngunakan minikube tunnel
- 6. Set url yg muncul sebagai baseUrl
+ 6. **Set url yg muncul sebagai baseUrl**
 

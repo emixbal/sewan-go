@@ -58,7 +58,7 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
 #### Mengakses API dengan Postman client
  1. download postman colections dari link ini
     [https://www.getpostman.com/collections/3797c3347deb99272049](https://www.getpostman.com/collections/3797c3347deb99272049)
- 2. saat app dijalankan telah otomati dibuat user level admin seeder. dengan credential
+ 2. saat app dijalankan telah otomatis dibuat seeder data user dengan level admin. dengan credential
     - email=emixbal@gmail.com
     - password=aaaaaaaa
     dengan credential diatas gunakan request "login refresh token" untuk login

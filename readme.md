@@ -4,7 +4,7 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
 
 ### App Stacks
  - Backend: golang dengan framework fiber, mysql dengan orm gorm
- - Deployments: docker, kubernetes. Pada jalan pada ubuntu desktop dengan installer dari minikube
+ - Deployments: docker, kubernetes. Kubernetes jalan pada pada ubuntu desktop dengan installer dari minikube.
 
 #### Menjalankan aplikasi dengan docker
 

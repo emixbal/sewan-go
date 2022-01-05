@@ -67,3 +67,7 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
     - jwtToken, lalu isikan dengan access_token yg didapat
     - jwtRefreshToken, lalu isikan dengan refresh_token yg didapat
 
+#### Auth DIagram
+[https://www.getpostman.com/collections/3797c3347deb99272049](https://www.getpostman.com/collections/3797c3347deb99272049)
+#### Refresh Token DIagram
+mengutip dari [https://www.alemba.help/help/content/topics/alemba%20api/aa%20programmers%20guide.htm](https://www.alemba.help/help/content/topics/alemba%20api/aa%20programmers%20guide.htm)

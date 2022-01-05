@@ -55,3 +55,15 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
         atau menngunakan minikube tunnel
  6. **Set url yg muncul sebagai baseUrl**
 
+#### Mengakses API dengan Postman client
+ 1. download postman colections dari link ini
+    [https://www.getpostman.com/collections/3797c3347deb99272049](https://www.getpostman.com/collections/3797c3347deb99272049)
+ 2. saat app dijalankan telah otomati dibuat user level admin seeder. dengan credential
+    - email=emixbal@gmail.com
+    - password=aaaaaaaa
+    dengan credential diatas gunakan request "login refresh token" untuk login
+ 3. ketika mendapat access access_token & refresh_token buat envoirement, dengan key
+    - baseUrl, lalau isikan value link yg telah digenarate
+    - jwtToken, lalu isikan dengan access_token yg didapat
+    - jwtRefreshToken, lalu isikan dengan refresh_token yg didapat
+

@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"net/http"
 	"sewan-go/config"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
-	Name     string `json:"name"`
-	IsAdmin  bool   `json:"is_admin,omitempty" gorm:"default:false"`
-	IsActive bool   `json:"is_active,omitempty" gorm:"default:true"`
-	Email    string `json:"email" gorm:"index:idx_name,unique"`
-	Password string `json:"-"`
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	IsAdmin   bool   `json:"is_admin,omitempty" gorm:"default:false"`
+	IsActive  bool   `json:"is_active,omitempty" gorm:"default:true"`
+	Email     string `json:"email" gorm:"index:idx_name,unique"`
+	Password  string `json:"-"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func FethAllUsers(limit, offset int) (Response, error) {

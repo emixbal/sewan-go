@@ -9,7 +9,6 @@ import (
 )
 
 func FetchAllproducts(c *fiber.Ctx) error {
-
 	limit := 15
 	offset := 0
 	if c.Query("per_page") != "" {
@@ -37,12 +36,17 @@ func CreateANewProduct(c *fiber.Ctx) error {
 
 	product.Name = c.FormValue("name")
 	product.Kode = c.FormValue("kode")
+	qty, _ := strconv.Atoi(c.FormValue("qty"))
+	product.Qty = qty
 
 	if product.Name == "" {
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
 	}
 	if product.Kode == "" {
-		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "no_isbn is required"})
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "kode is required"})
+	}
+	if product.Qty <= 1 {
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
 	}
 
 	result, _ := models.CreateAProduct(&product)

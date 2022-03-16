@@ -10,8 +10,9 @@ import (
 type Product struct {
 	ID        uint      `json:"id"`
 	IsActive  bool      `json:"is_active,omitempty" gorm:"default:true"`
-	Name      string    `json:"name"`
-	Kode      string    `json:"kode"`
+	Name      string    `json:"name" gorm:"not null default:''"`
+	Kode      string    `json:"kode" gorm:"not null default:''"`
+	Qty       int       `json:"qty" gorm:"not null default:1"`
 	CreatedAt time.Time `json:"created_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
 	UpdatedAt time.Time `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
 }

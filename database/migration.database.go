@@ -9,7 +9,10 @@ import (
 func InitMigration(db *gorm.DB) {
 	db.AutoMigrate(
 		&models.User{},
+		&models.Product{},
 		&models.Customer{},
+		&models.Transaction{},
+		&models.TransactionItem{},
 	)
 	InitSeeding(db)
 }

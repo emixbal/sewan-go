@@ -7,7 +7,10 @@ import (
 )
 
 func InitMigration(db *gorm.DB) {
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(
+		&models.User{},
+		&models.Customer{},
+	)
 	InitSeeding(db)
 }
 func InitSeeding(db *gorm.DB) {

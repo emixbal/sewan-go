@@ -21,7 +21,7 @@ func FetchAllproducts(c *fiber.Ctx) error {
 
 		}
 	}
-	if c.Query("per_page") != "" {
+	if c.Query("page") != "" {
 		offset, _ = strconv.Atoi(c.Query("page"))
 		if offset != 0 {
 			offset = offset - 1

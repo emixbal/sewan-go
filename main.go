@@ -7,9 +7,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 
-	"sejuta-cita/app/routers"
-	"sejuta-cita/config"
-	"sejuta-cita/database"
+	"sewan-go/app/routers"
+	"sewan-go/config"
+	"sewan-go/database"
 )
 
 func main() {

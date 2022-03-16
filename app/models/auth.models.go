@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"sejuta-cita/app/helpers"
-	"sejuta-cita/config"
+	"sewan-go/app/helpers"
+	"sewan-go/config"
 	"time"
 
 	"github.com/golang-jwt/jwt"

@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim             # Create a PersistentVolumeClaim to requ
 metadata:                               # Claim name and labels
   name: mysql-pv-claim
   labels:
-    app: sejuta-cita-mysql
+    app: sewan-go-mysql
 spec:                                   # Access mode and resource limits
   storageClassName: manual              # Request a certain storage class
   accessModes:

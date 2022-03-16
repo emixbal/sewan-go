@@ -3,8 +3,8 @@ package controllers
 import (
 	"log"
 	"net/http"
-	"sejuta-cita/app/models"
-	"sejuta-cita/app/requests"
+	"sewan-go/app/models"
+	"sewan-go/app/requests"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gookit/validate"

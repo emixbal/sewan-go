@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sejuta-cita-app
+  name: sewan-go-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      name: sejuta-cita-app
+      name: sewan-go-app
   template:
     metadata:
       labels:
-        name: sejuta-cita-app
+        name: sewan-go-app
     spec:
       containers:
       - name: application
-        image: emixbal/sejuta-cita:v1
+        image: emixbal/sewan-go:v1
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 3000
@@ -26,6 +26,6 @@ spec:
           - name: DB_PORT
             value: "3306"
           - name: DB_HOST
-            value: "sejuta-cita-mysql"
+            value: "sewan-go-mysql"
           - name: DB_NAME
             value: "sejutacita_api"

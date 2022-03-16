@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"net/http"
-	"sejuta-cita/app/models"
+	"sewan-go/app/models"
 
 	"github.com/gofiber/fiber/v2"
 )

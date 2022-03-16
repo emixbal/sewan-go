@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"net/http"
-	"sejuta-cita/config"
+	"sewan-go/config"
 
 	"gorm.io/gorm"
 )

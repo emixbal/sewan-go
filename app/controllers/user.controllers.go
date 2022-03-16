@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"sejuta-cita/app/helpers"
-	"sejuta-cita/app/models"
-	"sejuta-cita/app/requests"
+	"sewan-go/app/helpers"
+	"sewan-go/app/models"
+	"sewan-go/app/requests"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"

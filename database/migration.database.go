@@ -1,7 +1,7 @@
 package database
 
 import (
-	"sejuta-cita/app/models"
+	"sewan-go/app/models"
 
 	"gorm.io/gorm"
 )

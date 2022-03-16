@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sejuta-cita/app/models"
-	"sejuta-cita/app/requests"
-	"sejuta-cita/config"
+	"sewan-go/app/models"
+	"sewan-go/app/requests"
+	"sewan-go/config"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v2"

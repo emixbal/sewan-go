@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"sejuta-cita/app/controllers"
-	"sejuta-cita/app/middlewares"
+	"sewan-go/app/controllers"
+	"sewan-go/app/middlewares"
 
 	"github.com/gofiber/fiber/v2"
 )

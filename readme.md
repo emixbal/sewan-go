@@ -14,8 +14,8 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
 	```
  - prod
 	```
-	$ docker build -t sejuta-cita .
-	$ docker run -d --name sejuta-cita -e <ENV> -p 3000:3000 sejuta-cita 
+	$ docker build -t sewan-go .
+	$ docker run -d --name sewan-go -e <ENV> -p 3000:3000 sewan-go 
 	```
 	envoiremnts silahkan lihat di file docker-compose.yml
 
@@ -30,8 +30,8 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
 	```
  2. **Setup app**
 	aplikasi telah di build dan tersimpan di image registery docker hub, dengan nama 
-	emixbal/sejuta-cita gunakan tag v1
-	``` emixbal/sejuta-cita:v1 ```
+	emixbal/sewan-go gunakan tag v1
+	``` emixbal/sewan-go:v1 ```
  	```
 	$ kubectl apply -f k8s.app.deployment.yml
 	$ kubectl apply -f k8s.app.service.yml
@@ -41,17 +41,17 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
         ```
         $ kubectl get services
         ```
-        ![all service](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/services%20all.png)
+        ![all service](https://raw.githubusercontent.com/emixbal/sewan-go/main/images/services%20all.png)
         
         ```
         $ kubectl get pods
         ```  
-        ![all pods](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/pods%20all.png)
+        ![all pods](https://raw.githubusercontent.com/emixbal/sewan-go/main/images/pods%20all.png)
     - karena menggunkan minikube harus set external ip secarea manual
         ```
-        $ kubectl service sejuta-cita-service --url
+        $ kubectl service sewan-go-service --url
         ```
-        ![all pods](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/services%20generate%20url.png)
+        ![all pods](https://raw.githubusercontent.com/emixbal/sewan-go/main/images/services%20generate%20url.png)
         atau menngunakan minikube tunnel
  6. **Set url yg muncul sebagai baseUrl**
 
@@ -68,8 +68,8 @@ Rest API CRUD User dan User Login, dengan JWT token/refreshToken
     - jwtRefreshToken, lalu isikan dengan refresh_token yg didapat
 
 #### Auth DIagram
-![all pods](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/Picture1.jpg)
+![all pods](https://raw.githubusercontent.com/emixbal/sewan-go/main/images/Picture1.jpg)
 #### Refresh Token DIagram
 mengutip dari [https://www.alemba.help/help/content/topics/alemba%20api/aa%20programmers%20guide.htm](https://www.alemba.help/help/content/topics/alemba%20api/aa%20programmers%20guide.htm)
 
-![all pods](https://raw.githubusercontent.com/emixbal/sejuta-cita/main/images/refresh%20token.jpg)
+![all pods](https://raw.githubusercontent.com/emixbal/sewan-go/main/images/refresh%20token.jpg)

@@ -4,7 +4,7 @@ metadata:
   name: mysql-pv-volume
   labels:
     type: local
-    app: sejuta-cita-mysql
+    app: sewan-go-mysql
 spec:
   storageClassName: manual                  # Storage class. A PV Claim requesting the same storageClass can be bound to this volume. 
   capacity:

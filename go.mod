@@ -1,4 +1,4 @@
-module sejuta-cita
+module sewan-go
 
 go 1.13
 

@@ -1,8 +1,8 @@
 # Building the binary of the App
 FROM golang:1.17.2-alpine AS build
 
-# `sejuta-cita` should be replaced with your project name
-WORKDIR /go/src/sejuta-cita
+# `sewan-go` should be replaced with your project name
+WORKDIR /go/src/sewan-go
 
 # Copy all the Code and stuff to compile everything
 COPY . .
@@ -23,11 +23,11 @@ WORKDIR /app
 RUN mkdir ./static
 COPY ./static ./static
 
-# `sejuta-cita` should be replaced here as well
-COPY --from=build /go/src/sejuta-cita/app .
-COPY --from=build /go/src/sejuta-cita/.env .
+# `sewan-go` should be replaced here as well
+COPY --from=build /go/src/sewan-go/app .
+COPY --from=build /go/src/sewan-go/.env .
 
 # Exposes port 3000 because our program listens on that port
 EXPOSE 3000
 
-CMD ["./sejuta-cita"]
+CMD ["./sewan-go"]

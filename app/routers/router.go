@@ -16,4 +16,5 @@ func Init(app *fiber.App) {
 	Book(app)
 	User(app)
 	Auth(app)
+	Product(app)
 }

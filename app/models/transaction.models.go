@@ -9,6 +9,6 @@ type Transaction struct {
 	Customer   Customer
 	StartDate  time.Time `gorm:"not null" json:"start_date"`
 	EndDate    time.Time `gorm:"not null" json:"end_date"`
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
+	CreatedAt  time.Time `json:"created_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
+	UpdatedAt  time.Time `json:"updated_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
 }

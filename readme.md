@@ -1,7 +1,3 @@
-## SeujtaCita Tech test
-
-Rest API CRUD User dan User Login, dengan JWT token/refreshToken
-
 ### App Stacks
  - Backend: golang dengan framework fiber, mysql dengan orm gorm
  - Deployments: docker, kubernetes. Kubernetes jalan pada pada ubuntu desktop dengan installer dari minikube.

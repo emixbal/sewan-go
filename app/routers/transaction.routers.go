@@ -10,4 +10,6 @@ func Transaction(app *fiber.App) {
 	r := app.Group("/transactions")
 
 	r.Post("/", controllers.NewTransaction)
+	r.Get("/:transaction_id", controllers.TransactionDetail)
+	r.Post("/:transaction_id/add-items", controllers.AddItemToTransaction)
 }

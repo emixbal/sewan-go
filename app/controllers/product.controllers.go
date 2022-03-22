@@ -63,3 +63,29 @@ func CreateANewProduct(c *fiber.Ctx) error {
 	result, _ := models.CreateAProduct(&product)
 	return c.Status(result.Status).JSON(result)
 }
+
+func UpdateProduct(c *fiber.Ctx) error {
+	var product models.Product
+
+	product_id := c.Params("product_id")
+	product.Name = c.FormValue("name")
+	product.Kode = c.FormValue("kode")
+	qty, _ := strconv.Atoi(c.FormValue("qty"))
+	product.Qty = qty
+
+	if product_id == "" {
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "product_id is required"})
+	}
+	if product.Name == "" {
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
+	}
+	if product.Kode == "" {
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "kode is required"})
+	}
+	if product.Qty <= 1 {
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
+	}
+
+	result, _ := models.UpdateProduct(&product, product_id)
+	return c.Status(result.Status).JSON(result)
+}

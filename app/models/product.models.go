@@ -85,3 +85,34 @@ func CreateAProduct(product *Product) (Response, error) {
 
 	return res, nil
 }
+
+func UpdateProduct(product_payload *Product, product_id string) (Response, error) {
+	var res Response
+	var product Product
+
+	db := config.GetDBInstance()
+	result := db.Where("id = ?", product_id).Take(&product)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "something went wrong"
+		return res, result.Error
+	}
+
+	product.Name = product_payload.Name
+	product.Kode = product_payload.Kode
+	product.Qty = product_payload.Qty
+
+	db.Save(&product)
+
+	res.Status = http.StatusOK
+	res.Message = "success"
+	res.Data = product
+
+	return res, nil
+}

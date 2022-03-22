@@ -8,7 +8,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.24.0
 	github.com/gofiber/utils v0.1.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/golang-jwt/jwt/v4 v4.0.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.0.0
 	github.com/gookit/validate v1.2.11
 	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.13.6 // indirect

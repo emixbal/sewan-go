@@ -89,3 +89,9 @@ func UpdateProduct(c *fiber.Ctx) error {
 	result, _ := models.UpdateProduct(&product, product_id)
 	return c.Status(result.Status).JSON(result)
 }
+
+func ProductSoftDelete(c *fiber.Ctx) error {
+	result, _ := models.ProductSoftDelete(c.Params("product_id"))
+
+	return c.Status(result.Status).JSON(result)
+}

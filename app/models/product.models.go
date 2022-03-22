@@ -27,8 +27,8 @@ func FethAllProducts(limit, offset int) (Response, error) {
 	db := config.GetDBInstance()
 
 	if result := db.Limit(limit).Offset(offset).Where("is_active = ?", true).Find(&products); result.Error != nil {
-		fmt.Print("error FethAllproducts")
-		fmt.Print(result.Error)
+		fmt.Println("error FethAllproducts")
+		fmt.Println(result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error fetchin records"
@@ -55,6 +55,9 @@ func DetailProduct(product_id int) (Response, error) {
 			return res, result.Error
 		}
 
+		fmt.Println("error DetailProduct")
+		fmt.Println(result.Error)
+
 		res.Status = http.StatusInternalServerError
 		res.Message = "Something went wrong!"
 		return res, result.Error
@@ -71,8 +74,8 @@ func CreateAProduct(product *Product) (Response, error) {
 	db := config.GetDBInstance()
 
 	if result := db.Create(&product); result.Error != nil {
-		fmt.Print("error CreateAProduct")
-		fmt.Print(result.Error)
+		fmt.Println("error CreateAProduct")
+		fmt.Println(result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error save new record"
@@ -99,6 +102,9 @@ func UpdateProduct(product_payload *Product, product_id string) (Response, error
 			return res, result.Error
 		}
 
+		fmt.Println("error UpdateProduct")
+		fmt.Println(result.Error)
+
 		res.Status = http.StatusInternalServerError
 		res.Message = "something went wrong"
 		return res, result.Error
@@ -112,6 +118,45 @@ func UpdateProduct(product_payload *Product, product_id string) (Response, error
 
 	res.Status = http.StatusOK
 	res.Message = "success"
+	res.Data = product
+
+	return res, nil
+}
+
+func ProductSoftDelete(product_id string) (Response, error) {
+	var res Response
+	var product Product
+
+	db := config.GetDBInstance()
+	result := db.First(&product, product_id)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		fmt.Println("error ProductSoftDelete")
+		fmt.Println(result.Error)
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "Something went wrong!"
+		return res, result.Error
+	}
+
+	if !product.IsActive {
+		res.Status = http.StatusOK
+		res.Message = "product already inactive"
+
+		return res, nil
+	}
+
+	product.IsActive = false
+
+	db.Save(&product)
+
+	res.Status = http.StatusOK
+	res.Message = "Success"
 	res.Data = product
 
 	return res, nil

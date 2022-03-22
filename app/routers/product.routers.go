@@ -13,4 +13,5 @@ func Product(app *fiber.App) {
 	r.Get("/:product_id", controllers.ShowProductDetail)
 	r.Post("/", controllers.CreateANewProduct)
 	r.Put("/:product_id", controllers.UpdateProduct)
+	r.Delete("/:product_id", controllers.ProductSoftDelete)
 }

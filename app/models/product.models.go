@@ -1,10 +1,13 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"sewan-go/config"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Product struct {
@@ -35,6 +38,30 @@ func FethAllProducts(limit, offset int) (Response, error) {
 	res.Status = http.StatusOK
 	res.Message = "success"
 	res.Data = products
+
+	return res, nil
+}
+
+func DetailProduct(product_id int) (Response, error) {
+	var res Response
+	var product Product
+	db := config.GetDBInstance()
+
+	result := db.Where("is_active = ?", true).First(&product, product_id)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "Something went wrong!"
+		return res, result.Error
+	}
+	res.Status = http.StatusOK
+	res.Message = "Success"
+	res.Data = product
 
 	return res, nil
 }

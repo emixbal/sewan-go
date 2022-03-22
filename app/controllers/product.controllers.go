@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"sewan-go/app/models"
 	"strconv"
@@ -17,9 +18,9 @@ func FetchAllproducts(c *fiber.Ctx) error {
 			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 				"message": "too much data to show",
 			})
-
 		}
 	}
+
 	if c.Query("page") != "" {
 		offset, _ = strconv.Atoi(c.Query("page"))
 		if offset != 0 {
@@ -28,6 +29,16 @@ func FetchAllproducts(c *fiber.Ctx) error {
 	}
 
 	result, _ := models.FethAllProducts(limit, offset)
+	return c.Status(result.Status).JSON(result)
+}
+
+func ShowProductDetail(c *fiber.Ctx) error {
+	product_id, err_product_id := strconv.Atoi(c.Params("product_id"))
+	if err_product_id != nil {
+		log.Println("err_product_id==>", err_product_id)
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{"message": "product id is empty or invalid format"})
+	}
+	result, _ := models.DetailProduct(product_id)
 	return c.Status(result.Status).JSON(result)
 }
 

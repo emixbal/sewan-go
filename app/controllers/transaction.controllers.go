@@ -75,6 +75,6 @@ func AddItemToTransaction(c *fiber.Ctx) error {
 	item.ProductID = product_id
 	item.Qty = qty
 
-	result, _ := models.NewTransactionItem(&item)
+	result, _ := models.AddItemToTransaction(&item)
 	return c.Status(result.Status).JSON(result)
 }

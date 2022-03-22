@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"sewan-go/config"
 	"time"
@@ -65,13 +66,13 @@ func TransactionDetail(id int) (Response, error) {
 	return res, nil
 }
 
-func NewTransactionItem(item *TransactionItem) (Response, error) {
+func AddItemToTransaction(item *TransactionItem) (Response, error) {
 	var res Response
 	db := config.GetDBInstance()
 
 	if result := db.Create(&item); result.Error != nil {
-		fmt.Print("error CreateATransactionItem")
-		fmt.Print(result.Error)
+		log.Println("error CreateATransactionItem")
+		log.Println("result.Error==>", result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error save new record"

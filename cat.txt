@@ -9,8 +9,16 @@ WHERE
 	ti.product_id=@p_id
 	AND
    (
-		(t.start_date <= @s AND @s < t.end_date)
-	   OR (t.start_date < @e AND @e <= t.end_date)
-	   OR (@s <= t.start_date AND t.start_date < @e)
+	 	(
+			t.start_date <= @s AND @s < t.end_date
+      )
+	   OR 
+      (
+			t.start_date < @e AND @e <= t.end_date
+		)
+	   OR
+		(
+         @s <= t.start_date AND t.start_date < @e
+      )
 	)
 LIMIT 1 -- minimal query optimization

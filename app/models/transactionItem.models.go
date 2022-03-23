@@ -36,10 +36,19 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 		}
 	}
 
+	var sisa int
 	start := transaction.StartDate
 	end := transaction.EndDate
 	for d := start; d.After(end) == false; d = d.AddDate(0, 0, 1) {
-		fmt.Println(d)
+
+		fmt.Println("date===>", d)
+		qry := fmt.Sprintf("SELECT p.qty-SUM(ti.qty) AS sisa FROM  transaction_items ti LEFT JOIN transactions t ON ti.transaction_id=t.id LEFT JOIN products p ON ti.product_id=p.id WHERE ti.product_id=%d AND (t.start_date <=%d AND %d < t.end_date)", item.ProductID, d, d)
+		db.Raw(qry).Scan(&sisa)
+		if sisa < item.Qty {
+			fmt.Println("is masih? habis")
+		} else {
+			fmt.Println("is masih? masih")
+		}
 	}
 
 	// if result := db.Create(&item); result.Error != nil {

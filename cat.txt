@@ -1,0 +1,9 @@
+SET @e := '2022-03-27';
+SET @s := '2022-03-28';
+
+SELECT id FROM transactions
+            WHERE 
+                (start_date <= @s AND @s < end_date)
+                OR (start_date < @e AND @e <= end_date)
+                OR (@s <= start_date AND start_date < @e)
+            LIMIT 1 -- minimal query optimization

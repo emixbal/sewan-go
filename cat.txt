@@ -22,3 +22,17 @@ WHERE
       )
 	)
 LIMIT 1 -- minimal query optimization
+
+baru
+SET @td := '2022-05-05';
+SET @p_id := '2';
+
+SELECT ti.product_id, ti.qty, t.start_date, t.end_date FROM  transaction_items ti
+JOIN transactions t ON ti.transaction_id=t.id
+
+WHERE
+ti.product_id=@p_id
+AND
+(
+	t.start_date <= @td AND @td < t.end_date
+)

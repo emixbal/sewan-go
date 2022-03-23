@@ -1,9 +1,16 @@
 SET @e := '2022-03-27';
 SET @s := '2022-03-28';
+SET @p_id := '1';
 
-SELECT id FROM transactions
-            WHERE 
-                (start_date <= @s AND @s < end_date)
-                OR (start_date < @e AND @e <= end_date)
-                OR (@s <= start_date AND start_date < @e)
-            LIMIT 1 -- minimal query optimization
+SELECT ti.product_id, ti.qty, t.start_date, t.end_date FROM  transaction_items ti
+JOIN transactions t ON ti.transaction_id=t.id
+
+WHERE
+	ti.product_id=@p_id
+	AND
+   (
+		(t.start_date <= @s AND @s < t.end_date)
+	   OR (t.start_date < @e AND @e <= t.end_date)
+	   OR (@s <= t.start_date AND t.start_date < @e)
+	)
+LIMIT 1 -- minimal query optimization

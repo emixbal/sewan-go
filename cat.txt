@@ -27,8 +27,9 @@ baru
 SET @td := '2022-05-05';
 SET @p_id := '2';
 
-SELECT ti.product_id, ti.qty, t.start_date, t.end_date FROM  transaction_items ti
-JOIN transactions t ON ti.transaction_id=t.id
+SELECT p.qty-SUM(ti.qty) AS sisa FROM  transaction_items ti
+LEFT JOIN transactions t ON ti.transaction_id=t.id
+LEFT JOIN products p ON ti.product_id=p.id
 
 WHERE
 ti.product_id=@p_id

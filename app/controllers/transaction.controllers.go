@@ -26,6 +26,10 @@ func NewTransaction(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "end_date is empty or invalid format"})
 	}
 
+	if start_date.Before(end_date) == false {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "end_date must be after start_date"})
+	}
+
 	customer_id, err_customer_id := strconv.Atoi(c.FormValue("customer_id"))
 	if err_customer_id != nil {
 		log.Println("err_customer_id==> ", err_customer_id)

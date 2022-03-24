@@ -23,7 +23,7 @@ WHERE
 	)
 LIMIT 1 -- minimal query optimization
 
-baru
+###################baru
 SET @td := '2022-05-05';
 SET @p_id := '2';
 
@@ -37,3 +37,20 @@ AND
 (
 	t.start_date <= @td AND @td < t.end_date
 )
+
+
+
+####################baru lagi
+SELECT
+				p.qty-SUM(ti.qty) AS sisa
+			FROM
+				transaction_items ti
+				LEFT JOIN transactions t ON ti.transaction_id = t.id
+				LEFT JOIN products p ON ti.product_id = p.id 
+			WHERE
+				ti.product_id = ?
+				AND
+					(
+						t.start_date <= ? AND ? < t.end_date
+					)
+			GROUP BY p.id

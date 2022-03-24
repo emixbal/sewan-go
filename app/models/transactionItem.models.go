@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"sewan-go/config"
@@ -54,11 +53,9 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 			item.ProductID, item.ProductID, d, d,
 		).Scan(&sisa)
 
-		fmt.Println("sisa===>", sisa)
-
 		if item.Qty > sisa {
-			res.Status = http.StatusOK
-			res.Message = "kurang"
+			res.Status = http.StatusBadRequest
+			res.Message = "out of stock"
 			return res, nil
 		}
 	}
@@ -73,7 +70,6 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
-
+	res.Message = config.SuccessMessage
 	return res, nil
 }

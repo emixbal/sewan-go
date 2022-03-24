@@ -28,7 +28,7 @@ func UserRegister(user *User) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 
 	return res, nil
 }

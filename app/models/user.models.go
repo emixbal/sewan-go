@@ -37,7 +37,7 @@ func FethAllUsers(limit, offset int) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = users
 
 	return res, nil
@@ -61,7 +61,7 @@ func ShowUserDetail(user_id string) (Response, error) {
 		return res, result.Error
 	}
 	res.Status = http.StatusOK
-	res.Message = "Success"
+	res.Message = config.SuccessMessage
 	res.Data = user
 
 	return res, nil
@@ -81,7 +81,7 @@ func CreateAUser(user *User) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = user
 
 	return res, nil
@@ -117,7 +117,7 @@ func UserSoftDelete(user_id string) (Response, error) {
 	db.Save(&user)
 
 	res.Status = http.StatusOK
-	res.Message = "Success"
+	res.Message = config.SuccessMessage
 	res.Data = user
 
 	return res, nil
@@ -147,7 +147,7 @@ func UserUpdate(user_payload *User, user_id string) (Response, error) {
 	db.Save(&user)
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = user
 
 	return res, nil
@@ -167,7 +167,7 @@ func UserHardDelete(user_id string) (Response, error) {
 		return res, result.Error
 	}
 	res.Status = http.StatusOK
-	res.Message = "Success"
+	res.Message = config.SuccessMessage
 
 	return res, nil
 }
@@ -195,7 +195,7 @@ func NewPassword(user_id string, hashPassword string) (Response, error) {
 	db.Save(&user)
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = user
 
 	return res, nil

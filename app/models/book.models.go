@@ -31,7 +31,7 @@ func FethAllBooks() (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = books
 
 	return res, nil
@@ -51,7 +51,7 @@ func CreateABook(book *Book) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = book
 
 	return res, nil

@@ -36,7 +36,7 @@ func FethAllProducts(limit, offset int) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = products
 
 	return res, nil
@@ -63,7 +63,7 @@ func DetailProduct(product_id int) (Response, error) {
 		return res, result.Error
 	}
 	res.Status = http.StatusOK
-	res.Message = "Success"
+	res.Message = config.SuccessMessage
 	res.Data = product
 
 	return res, nil
@@ -83,7 +83,7 @@ func CreateAProduct(product *Product) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = product
 
 	return res, nil
@@ -117,7 +117,7 @@ func UpdateProduct(product_payload *Product, product_id string) (Response, error
 	db.Save(&product)
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = product
 
 	return res, nil
@@ -156,7 +156,7 @@ func ProductSoftDelete(product_id string) (Response, error) {
 	db.Save(&product)
 
 	res.Status = http.StatusOK
-	res.Message = "Success"
+	res.Message = config.SuccessMessage
 	res.Data = product
 
 	return res, nil

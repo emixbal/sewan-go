@@ -36,7 +36,7 @@ func NewTransaction(transaction *Transaction) (Response, error) {
 	}
 
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 
 	return res, nil
 }
@@ -59,7 +59,7 @@ func TransactionDetail(id int) (Response, error) {
 		return res, result.Error
 	}
 	res.Status = http.StatusOK
-	res.Message = "success"
+	res.Message = config.SuccessMessage
 	res.Data = transaction
 
 	return res, nil

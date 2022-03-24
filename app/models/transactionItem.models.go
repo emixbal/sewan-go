@@ -54,6 +54,10 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 		).Scan(&sisa)
 
 		if item.Qty > sisa {
+			log.Println("=================OUT OF STOCK=================")
+			log.Println("sisa==>", sisa)
+			log.Println("item.Qty==>", item.Qty)
+
 			res.Status = http.StatusBadRequest
 			res.Message = "out of stock"
 			return res, nil

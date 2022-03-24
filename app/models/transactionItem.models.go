@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"sewan-go/config"
@@ -37,7 +38,6 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 	}
 
 	var sisa int
-
 	start := transaction.StartDate
 	end := transaction.EndDate
 	for d := start; d.After(end) == false; d = d.AddDate(0, 0, 1) {
@@ -52,6 +52,8 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 			`,
 			item.ProductID, item.ProductID, d, d,
 		).Scan(&sisa)
+
+		fmt.Println("sisa===>", sisa)
 
 		if item.Qty > sisa {
 			res.Status = http.StatusOK

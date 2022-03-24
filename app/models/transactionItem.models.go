@@ -2,7 +2,7 @@ package models
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"net/http"
 	"sewan-go/config"
 	"time"
@@ -37,28 +37,37 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 	}
 
 	var sisa int
+
 	start := transaction.StartDate
 	end := transaction.EndDate
 	for d := start; d.After(end) == false; d = d.AddDate(0, 0, 1) {
+		db.Raw(
+			`
+			SELECT
+				(SELECT products.qty FROM products WHERE products.id = ? ) - IFNULL(SUM( ( SELECT transaction_items.qty FROM transaction_items WHERE transaction_items.transaction_id = t.id AND transaction_items.product_id = ? ) ),0) AS sisa
+			FROM
+				transactions t 
+			WHERE
+				t.start_date <= ? AND ? < t.end_date
+			`,
+			item.ProductID, item.ProductID, d, d,
+		).Scan(&sisa)
 
-		fmt.Println("date===>", d)
-		qry := fmt.Sprintf("SELECT p.qty-SUM(ti.qty) AS sisa FROM  transaction_items ti LEFT JOIN transactions t ON ti.transaction_id=t.id LEFT JOIN products p ON ti.product_id=p.id WHERE ti.product_id=%d AND (t.start_date <=%d AND %d < t.end_date)", item.ProductID, d, d)
-		db.Raw(qry).Scan(&sisa)
-		if sisa < item.Qty {
-			fmt.Println("is masih? habis")
-		} else {
-			fmt.Println("is masih? masih")
+		if item.Qty > sisa {
+			res.Status = http.StatusOK
+			res.Message = "kurang"
+			return res, nil
 		}
 	}
 
-	// if result := db.Create(&item); result.Error != nil {
-	// 	log.Println("error CreateATransactionItem")
-	// 	log.Println("result.Error==>", result.Error)
+	if result := db.Create(&item); result.Error != nil {
+		log.Println("error AddItemToTransaction")
+		log.Println("result.Error==>", result.Error)
 
-	// 	res.Status = http.StatusInternalServerError
-	// 	res.Message = "error save new record"
-	// 	return res, result.Error
-	// }
+		res.Status = http.StatusInternalServerError
+		res.Message = "error save new record"
+		return res, result.Error
+	}
 
 	res.Status = http.StatusOK
 	res.Message = "success"

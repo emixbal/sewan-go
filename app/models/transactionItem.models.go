@@ -44,11 +44,12 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 		db.Raw(
 			`
 			SELECT
-				(SELECT products.qty FROM products WHERE products.id = ? ) - IFNULL(SUM( ( SELECT transaction_items.qty FROM transaction_items WHERE transaction_items.transaction_id = t.id AND transaction_items.product_id = ? ) ),0) AS sisa
+				((SELECT products.qty FROM products WHERE products.id = ? ) - IFNULL(SUM((SELECT ti.qty FROM transaction_items ti WHERE ti.transaction_id=t.id AND ti.product_id=?)),0)) AS sisa
 			FROM
 				transactions t 
 			WHERE
-				t.start_date <= ? AND ? < t.end_date
+				t.start_date <= ?
+				AND ? <= t.end_date
 			`,
 			item.ProductID, item.ProductID, d, d,
 		).Scan(&sisa)
@@ -73,7 +74,6 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 
 	res.Status = http.StatusOK
 	res.Message = "success"
-	res.Data = transaction
 
 	return res, nil
 }

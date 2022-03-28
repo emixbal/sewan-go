@@ -36,6 +36,23 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 		}
 	}
 
+	var total_prod_in_transaction int64
+	prod_is_exist := db.Model(&TransactionItem{}).Where("transaction_id = ?", item.TransactionID).Count(&total_prod_in_transaction)
+	if prod_is_exist.Error != nil {
+		res.Status = http.StatusInternalServerError
+		res.Message = "something went wrong"
+		return res, prod_is_exist.Error
+	}
+
+	if total_prod_in_transaction > 0 {
+		log.Println("=================PRODUCT ALREADY EXIST=================")
+		log.Println("total_prod_in_transaction==>", total_prod_in_transaction)
+
+		res.Status = http.StatusBadRequest
+		res.Message = "product already exist"
+		return res, nil
+	}
+
 	var sisa int
 	start := transaction.StartDate
 	end := transaction.EndDate
@@ -75,5 +92,24 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
+	return res, nil
+}
+
+func TransactionItemDelete(item_id string) (Response, error) {
+	var res Response
+	var item TransactionItem
+
+	db := config.GetDBInstance()
+	result := db.Unscoped().Delete(&item, item_id)
+
+	if result.Error != nil {
+		res.Status = http.StatusInternalServerError
+		res.Message = "Error"
+
+		return res, result.Error
+	}
+	res.Status = http.StatusOK
+	res.Message = config.SuccessMessage
+
 	return res, nil
 }

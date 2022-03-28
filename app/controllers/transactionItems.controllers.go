@@ -37,3 +37,9 @@ func AddItemToTransaction(c *fiber.Ctx) error {
 	result, _ := models.AddItemToTransaction(&item)
 	return c.Status(result.Status).JSON(result)
 }
+
+func TransactionItemDelete(c *fiber.Ctx) error {
+	result, _ := models.TransactionItemDelete(c.Params("item_id"))
+
+	return c.Status(result.Status).JSON(result)
+}

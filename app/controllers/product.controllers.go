@@ -45,10 +45,19 @@ func ShowProductDetail(c *fiber.Ctx) error {
 func CreateANewProduct(c *fiber.Ctx) error {
 	var product models.Product
 
-	product.Name = c.FormValue("name")
-	product.Kode = c.FormValue("kode")
-	qty, _ := strconv.Atoi(c.FormValue("qty"))
-	product.Qty = qty
+	payload := struct {
+		Name string `json:"name"`
+		Kode string `json:"kode"`
+		Qty  int    `json:"qty"`
+	}{}
+
+	if err := c.BodyParser(&payload); err != nil {
+		return err
+	}
+
+	product.Name = payload.Name
+	product.Kode = payload.Kode
+	product.Qty = payload.Qty
 
 	if product.Name == "" {
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})

@@ -60,12 +60,15 @@ func CreateANewProduct(c *fiber.Ctx) error {
 	product.Qty = payload.Qty
 
 	if product.Name == "" {
+		log.Println("name is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
 	}
 	if product.Kode == "" {
+		log.Println("kode is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "kode is required"})
 	}
-	if product.Qty <= 1 {
+	if product.Qty < 1 {
+		log.Println("qty is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
 	}
 

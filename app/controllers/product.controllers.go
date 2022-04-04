@@ -80,21 +80,35 @@ func UpdateProduct(c *fiber.Ctx) error {
 	var product models.Product
 
 	product_id := c.Params("product_id")
-	product.Name = c.FormValue("name")
-	product.Kode = c.FormValue("kode")
-	qty, _ := strconv.Atoi(c.FormValue("qty"))
-	product.Qty = qty
+
+	payload := struct {
+		Name string `json:"name"`
+		Kode string `json:"kode"`
+		Qty  int    `json:"qty"`
+	}{}
+
+	if err := c.BodyParser(&payload); err != nil {
+		return err
+	}
+
+	product.Name = payload.Name
+	product.Kode = payload.Kode
+	product.Qty = payload.Qty
 
 	if product_id == "" {
+		log.Println("product_id is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "product_id is required"})
 	}
 	if product.Name == "" {
+		log.Println("name is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
 	}
 	if product.Kode == "" {
+		log.Println("kode is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "kode is required"})
 	}
 	if product.Qty <= 1 {
+		log.Println("qty is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
 	}
 

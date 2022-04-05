@@ -7,6 +7,7 @@ import (
 type Customer struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
+	Address   string    `json:"address"`
 	Email     string    `json:"email" gorm:"index:idx_email,unique"`
 	Phone     string    `json:"phone" gorm:"index:idx_phone,unique"`
 	IsActive  bool      `json:"is_active,omitempty" gorm:"default:true"`

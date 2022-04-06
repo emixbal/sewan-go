@@ -9,7 +9,7 @@ import (
 func Transaction(app *fiber.App) {
 	r := app.Group("/transactions")
 
-	r.Post("/", controllers.NewTransaction)
+	r.Post("/", controllers.TransactionNew)
 	r.Get("/:transaction_id", controllers.TransactionDetail)
 	r.Post("/:transaction_id/add-items", controllers.AddItemToTransaction)
 

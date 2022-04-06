@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func NewTransaction(c *fiber.Ctx) error {
+func TransactionNew(c *fiber.Ctx) error {
 	var transaction models.Transaction
 
 	layout := "2006-01-02"

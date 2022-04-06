@@ -22,7 +22,7 @@ type Transaction struct {
 	UpdatedAt        time.Time         `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
 }
 
-func NewTransaction(transaction *Transaction) (Response, error) {
+func TransactionNew(transaction *Transaction) (Response, error) {
 	var res Response
 	db := config.GetDBInstance()
 
@@ -37,6 +37,7 @@ func NewTransaction(transaction *Transaction) (Response, error) {
 
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
+	res.Data = transaction
 
 	return res, nil
 }

@@ -40,7 +40,7 @@ func TransactionNew(c *fiber.Ctx) error {
 	transaction.EndDate = end_date
 	transaction.CustomerID = customer_id
 
-	result, _ := models.NewTransaction(&transaction)
+	result, _ := models.TransactionNew(&transaction)
 	return c.Status(result.Status).JSON(result)
 }
 

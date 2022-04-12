@@ -16,6 +16,7 @@ type Product struct {
 	Name      string    `json:"name" gorm:"not null default:''"`
 	Kode      string    `json:"kode" gorm:"not null default:''"`
 	Qty       int       `json:"qty" gorm:"not null default:1"`
+	Price     int       `json:"price" gorm:"not null default:0"`
 	CreatedAt time.Time `json:"created_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
 	UpdatedAt time.Time `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
 }

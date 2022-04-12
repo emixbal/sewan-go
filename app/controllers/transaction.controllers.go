@@ -53,3 +53,13 @@ func TransactionDetail(c *fiber.Ctx) error {
 	result, _ := models.TransactionDetail(transaction_id)
 	return c.Status(result.Status).JSON(result)
 }
+
+func TransactionShowItems(c *fiber.Ctx) error {
+	transaction_id, err_transaction_id := strconv.Atoi(c.Params("transaction_id"))
+	if err_transaction_id != nil {
+		log.Println(err_transaction_id)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
+	}
+	result, _ := models.TransactionShowItems(transaction_id)
+	return c.Status(result.Status).JSON(result)
+}

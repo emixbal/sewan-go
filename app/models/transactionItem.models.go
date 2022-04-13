@@ -37,7 +37,7 @@ func AddItemToTransaction(item *TransactionItem) (Response, error) {
 	}
 
 	var total_prod_in_transaction int64
-	prod_is_exist := db.Model(&TransactionItem{}).Where("transaction_id = ?", item.TransactionID).Count(&total_prod_in_transaction)
+	prod_is_exist := db.Model(&TransactionItem{}).Where("transaction_id = ? AND product_id = ?", item.TransactionID, item.ProductID).Count(&total_prod_in_transaction)
 	if prod_is_exist.Error != nil {
 		res.Status = http.StatusInternalServerError
 		res.Message = "something went wrong"

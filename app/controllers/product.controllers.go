@@ -46,9 +46,10 @@ func CreateANewProduct(c *fiber.Ctx) error {
 	var product models.Product
 
 	payload := struct {
-		Name string `json:"name"`
-		Kode string `json:"kode"`
-		Qty  int    `json:"qty"`
+		Name  string `json:"name"`
+		Price int    `json:"price"`
+		Kode  string `json:"kode"`
+		Qty   int    `json:"qty"`
 	}{}
 
 	if err := c.BodyParser(&payload); err != nil {
@@ -56,12 +57,17 @@ func CreateANewProduct(c *fiber.Ctx) error {
 	}
 
 	product.Name = payload.Name
+	product.Price = payload.Price
 	product.Kode = payload.Kode
 	product.Qty = payload.Qty
 
 	if product.Name == "" {
 		log.Println("name is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
+	}
+	if product.Price < 1 {
+		log.Println("price is required")
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "price is required"})
 	}
 	if product.Kode == "" {
 		log.Println("kode is required")
@@ -82,9 +88,10 @@ func UpdateProduct(c *fiber.Ctx) error {
 	product_id := c.Params("product_id")
 
 	payload := struct {
-		Name string `json:"name"`
-		Kode string `json:"kode"`
-		Qty  int    `json:"qty"`
+		Name  string `json:"name"`
+		Price int    `json:"price"`
+		Kode  string `json:"kode"`
+		Qty   int    `json:"qty"`
 	}{}
 
 	if err := c.BodyParser(&payload); err != nil {
@@ -92,6 +99,7 @@ func UpdateProduct(c *fiber.Ctx) error {
 	}
 
 	product.Name = payload.Name
+	product.Price = payload.Price
 	product.Kode = payload.Kode
 	product.Qty = payload.Qty
 
@@ -103,11 +111,15 @@ func UpdateProduct(c *fiber.Ctx) error {
 		log.Println("name is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "name is required"})
 	}
+	if product.Price < 1 {
+		log.Println("price is required")
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "price is required"})
+	}
 	if product.Kode == "" {
 		log.Println("kode is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "kode is required"})
 	}
-	if product.Qty <= 1 {
+	if product.Qty < 1 {
 		log.Println("qty is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
 	}

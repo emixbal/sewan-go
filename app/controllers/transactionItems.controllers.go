@@ -52,21 +52,23 @@ func TransactionItemDelete(c *fiber.Ctx) error {
 func TransactionItemUpdateQty(c *fiber.Ctx) error {
 	var item models.TransactionItem
 
-	item_id := c.Params("item_id")
+	transaction_id := c.Params("transaction_id")
 
 	payload := struct {
-		Qty int `json:"qty"`
+		ItemId uint `json:"item_id"`
+		Qty    int  `json:"qty"`
 	}{}
 
 	if err := c.BodyParser(&payload); err != nil {
 		return err
 	}
 
+	item.ID = payload.ItemId
 	item.Qty = payload.Qty
 	if item.Qty < 1 {
 		log.Println("qty is required")
 		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
 	}
-	result, _ := models.TransactionItemUpdateQty(item_id, &item)
+	result, _ := models.TransactionItemUpdateQty(transaction_id, &item)
 	return c.Status(result.Status).JSON(result)
 }

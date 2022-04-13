@@ -115,12 +115,12 @@ func TransactionItemDelete(item_id string) (Response, error) {
 	return res, nil
 }
 
-func TransactionItemUpdateQty(item_id string, item_payload *TransactionItem) (Response, error) {
+func TransactionItemUpdateQty(transaction_id string, item_payload *TransactionItem) (Response, error) {
 	var res Response
 	var item TransactionItem
 
 	db := config.GetDBInstance()
-	result := db.Where("id = ?", item_id).Take(&item)
+	result := db.Where("id = ?", item_payload.ID).Take(&item)
 	if result.Error != nil {
 		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
 			res.Status = http.StatusOK

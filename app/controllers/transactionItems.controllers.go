@@ -48,3 +48,25 @@ func TransactionItemDelete(c *fiber.Ctx) error {
 
 	return c.Status(result.Status).JSON(result)
 }
+
+func TransactionItemUpdateQty(c *fiber.Ctx) error {
+	var item models.TransactionItem
+
+	item_id := c.Params("item_id")
+
+	payload := struct {
+		Qty int `json:"qty"`
+	}{}
+
+	if err := c.BodyParser(&payload); err != nil {
+		return err
+	}
+
+	item.Qty = payload.Qty
+	if item.Qty < 1 {
+		log.Println("qty is required")
+		return c.Status(http.StatusBadRequest).JSON(map[string]string{"message": "qty is required"})
+	}
+	result, _ := models.TransactionItemUpdateQty(item_id, &item)
+	return c.Status(result.Status).JSON(result)
+}

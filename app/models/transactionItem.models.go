@@ -103,6 +103,7 @@ func TransactionItemDelete(item_id string) (Response, error) {
 	result := db.Unscoped().Delete(&item, item_id)
 
 	if result.Error != nil {
+		log.Println(result.Error)
 		res.Status = http.StatusInternalServerError
 		res.Message = "Error"
 
@@ -110,6 +111,38 @@ func TransactionItemDelete(item_id string) (Response, error) {
 	}
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
+
+	return res, nil
+}
+
+func TransactionItemUpdateQty(item_id string, item_payload *TransactionItem) (Response, error) {
+	var res Response
+	var item TransactionItem
+
+	db := config.GetDBInstance()
+	result := db.Where("id = ?", item_id).Take(&item)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		log.Println("error TransactionItemUpdateQty")
+		log.Println(result.Error)
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "something went wrong"
+		return res, result.Error
+	}
+
+	item.Qty = item_payload.Qty
+
+	db.Save(&item)
+
+	res.Status = http.StatusOK
+	res.Message = config.SuccessMessage
+	res.Data = item
 
 	return res, nil
 }

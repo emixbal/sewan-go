@@ -14,5 +14,6 @@ func Transaction(app *fiber.App) {
 	r.Get("/:transaction_id", controllers.TransactionDetail)
 	r.Get("/:transaction_id/items", controllers.TransactionShowItems)
 	r.Post("/:transaction_id/add-items", controllers.AddItemToTransaction)
-	r.Delete("/:item_id", controllers.TransactionItemDelete)
+	r.Delete("/item/:item_id", controllers.TransactionItemDelete)
+	r.Put("/item/:item_id", controllers.TransactionItemUpdateQty)
 }

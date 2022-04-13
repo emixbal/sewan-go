@@ -77,10 +77,11 @@ func TransactionDetail(id int) (Response, error) {
 
 func TransactionShowItems(id int) (Response, error) {
 	var res Response
+	var arrTransactionItem []TransactionItemRes
 	var arrTransactionItemRes []TransactionItemRes
 	db := config.GetDBInstance()
 
-	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join products p on p.id = ti.product_id").Scan(&arrTransactionItemRes)
+	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join products p on p.id = ti.product_id").Scan(&arrTransactionItem)
 	if result.Error != nil {
 		log.Println("err TransactionShowItems")
 		log.Println(result.Error)
@@ -89,7 +90,7 @@ func TransactionShowItems(id int) (Response, error) {
 		return res, nil
 	}
 
-	for _, item := range arrTransactionItemRes {
+	for _, item := range arrTransactionItem {
 		item.SubTotal = item.Price * item.Qty
 		arrTransactionItemRes = append(arrTransactionItemRes, item)
 	}

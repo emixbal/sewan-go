@@ -118,25 +118,63 @@ func TransactionItemDelete(item_id string) (Response, error) {
 func TransactionItemUpdateQty(transaction_id string, item_payload *TransactionItem) (Response, error) {
 	var res Response
 	var item TransactionItem
+	var transaction Transaction
 
 	db := config.GetDBInstance()
-	result := db.Where("id = ?", item_payload.ID).Take(&item)
-	if result.Error != nil {
-		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+	result_trx := db.First(&transaction, transaction_id)
+	if result_trx.Error != nil {
+		if is_notfound := errors.Is(result_trx.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find transaction"
+			return res, result_trx.Error
+		}
+	}
+
+	result_item := db.Where("id = ?", item_payload.ID).Take(&item)
+	if result_item.Error != nil {
+		if is_notfound := errors.Is(result_item.Error, gorm.ErrRecordNotFound); is_notfound {
 			res.Status = http.StatusOK
 			res.Message = "can't find record"
-			return res, result.Error
+			return res, result_item.Error
 		}
 
 		log.Println("error TransactionItemUpdateQty")
-		log.Println(result.Error)
+		log.Println(result_item.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "something went wrong"
-		return res, result.Error
+		return res, result_item.Error
 	}
 
 	item.Qty = item_payload.Qty
+
+	var sisa int
+	start := transaction.StartDate
+	end := transaction.EndDate
+	for d := start; d.After(end) == false; d = d.AddDate(0, 0, 1) {
+		db.Raw(
+			`
+			SELECT
+				((SELECT products.qty FROM products WHERE products.id = ? ) - IFNULL(SUM((SELECT ti.qty FROM transaction_items ti WHERE ti.transaction_id=t.id AND ti.product_id=?)),0)) AS sisa
+			FROM
+				transactions t 
+			WHERE
+				t.start_date <= ?
+				AND ? <= t.end_date
+			`,
+			item.ProductID, item.ProductID, d, d,
+		).Scan(&sisa)
+
+		if item.Qty > sisa {
+			log.Println("=================OUT OF STOCK=================")
+			log.Println("sisa==>", sisa)
+			log.Println("item.Qty==>", item.Qty)
+
+			res.Status = http.StatusBadRequest
+			res.Message = "out of stock"
+			return res, nil
+		}
+	}
 
 	db.Save(&item)
 

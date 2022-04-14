@@ -119,7 +119,7 @@ func TransactionList(limit, offset int) (Response, error) {
 	result := db.Raw(`
 		SELECT
 			t.id, t.start_date, t.end_date, c.name AS pemesan,
-			(SELECT SUM(p.price) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan
+			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan
 		FROM transactions t
 		LEFT JOIN customers c ON c.id = t.customer_id
 		WHERE t.is_active=?`, true).Scan(&transactionRes)

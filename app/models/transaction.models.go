@@ -81,7 +81,7 @@ func TransactionShowItems(id int) (Response, error) {
 	var arrTransactionItemRes []TransactionItemRes
 	db := config.GetDBInstance()
 
-	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join products p on p.id = ti.product_id").Scan(&arrTransactionItem)
+	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join transactions p on p.id = ti.product_id").Scan(&arrTransactionItem)
 	if result.Error != nil {
 		log.Println("err TransactionShowItems")
 		log.Println(result.Error)
@@ -98,6 +98,28 @@ func TransactionShowItems(id int) (Response, error) {
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
 	res.Data = arrTransactionItemRes
+
+	return res, nil
+}
+
+func TransactionList(limit, offset int) (Response, error) {
+	var transactions []Transaction
+	var res Response
+
+	db := config.GetDBInstance()
+
+	if result := db.Limit(limit).Offset(offset).Where("is_active = ?", true).Find(&transactions); result.Error != nil {
+		fmt.Println("error TransactionList")
+		fmt.Println(result.Error)
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "error fetchin records"
+		return res, result.Error
+	}
+
+	res.Status = http.StatusOK
+	res.Message = config.SuccessMessage
+	res.Data = transactions
 
 	return res, nil
 }

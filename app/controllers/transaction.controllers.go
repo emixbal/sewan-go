@@ -63,3 +63,26 @@ func TransactionShowItems(c *fiber.Ctx) error {
 	result, _ := models.TransactionShowItems(transaction_id)
 	return c.Status(result.Status).JSON(result)
 }
+
+func TransactionList(c *fiber.Ctx) error {
+	limit := 15
+	offset := 0
+	if c.Query("per_page") != "" {
+		limit, _ = strconv.Atoi(c.Query("per_page"))
+		if limit > 50 {
+			return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+				"message": "too much data to show",
+			})
+		}
+	}
+
+	if c.Query("page") != "" {
+		offset, _ = strconv.Atoi(c.Query("page"))
+		if offset != 0 {
+			offset = offset - 1
+		}
+	}
+
+	result, _ := models.TransactionList(limit, offset)
+	return c.Status(result.Status).JSON(result)
+}

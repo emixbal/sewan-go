@@ -23,14 +23,6 @@ type Transaction struct {
 	UpdatedAt        time.Time         `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
 }
 
-type TransactionItemRes struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Qty      int    `json:"qty"`
-	Price    int    `json:"price"`
-	SubTotal int    `json:"sub_total"`
-}
-
 func TransactionNew(transaction *Transaction) (Response, error) {
 	var res Response
 	db := config.GetDBInstance()
@@ -76,6 +68,14 @@ func TransactionDetail(id int) (Response, error) {
 }
 
 func TransactionShowItems(id int) (Response, error) {
+	type TransactionItemRes struct {
+		Id       int    `json:"id"`
+		Name     string `json:"name"`
+		Qty      int    `json:"qty"`
+		Price    int    `json:"price"`
+		SubTotal int    `json:"sub_total"`
+	}
+
 	var res Response
 	var arrTransactionItem []TransactionItemRes
 	var arrTransactionItemRes []TransactionItemRes
@@ -103,14 +103,23 @@ func TransactionShowItems(id int) (Response, error) {
 }
 
 func TransactionList(limit, offset int) (Response, error) {
-	var transactions []Transaction
+	type TransactionRes struct {
+		Id        int    `json:"id"`
+		StartDate string `json:"start_date"`
+		EndDate   string `json:"end_date"`
+		Pemesan   string `json:"pemesan"`
+		Name      string `json:"name"`
+	}
+
+	var transactionRes []TransactionRes
 	var res Response
 
 	db := config.GetDBInstance()
 
-	if result := db.Limit(limit).Offset(offset).Where("is_active = ?", true).Find(&transactions); result.Error != nil {
-		fmt.Println("error TransactionList")
-		fmt.Println(result.Error)
+	result := db.Table("transactions t").Select("t.id, t.start_date, t.end_date, c.name AS pemesan").Joins("left join customers c on c.id = t.customer_id").Scan(&transactionRes)
+	if result.Error != nil {
+		log.Println("err TransactionList")
+		log.Println(result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error fetchin records"
@@ -119,7 +128,7 @@ func TransactionList(limit, offset int) (Response, error) {
 
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
-	res.Data = transactions
+	res.Data = transactionRes
 
 	return res, nil
 }

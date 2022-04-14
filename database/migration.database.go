@@ -13,6 +13,7 @@ func InitMigration(db *gorm.DB) {
 		&models.Customer{},
 		&models.Transaction{},
 		&models.TransactionItem{},
+		&models.Payment{},
 	)
 	InitSeeding(db)
 }

@@ -81,7 +81,7 @@ func TransactionShowItems(id int) (Response, error) {
 	var arrTransactionItemRes []TransactionItemRes
 	db := config.GetDBInstance()
 
-	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join transactions p on p.id = ti.product_id").Scan(&arrTransactionItem)
+	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join products p on p.id = ti.product_id").Scan(&arrTransactionItem)
 	if result.Error != nil {
 		log.Println("err TransactionShowItems")
 		log.Println(result.Error)
@@ -104,11 +104,11 @@ func TransactionShowItems(id int) (Response, error) {
 
 func TransactionList(limit, offset int) (Response, error) {
 	type TransactionRes struct {
-		Id        int    `json:"id"`
-		StartDate string `json:"start_date"`
-		EndDate   string `json:"end_date"`
-		Pemesan   string `json:"pemesan"`
-		Name      string `json:"name"`
+		Id           int    `json:"id"`
+		StartDate    string `json:"start_date"`
+		EndDate      string `json:"end_date"`
+		Pemesan      string `json:"pemesan"`
+		TotalTagihan uint   `json:"total_tagihan"`
 	}
 
 	var transactionRes []TransactionRes
@@ -116,7 +116,13 @@ func TransactionList(limit, offset int) (Response, error) {
 
 	db := config.GetDBInstance()
 
-	result := db.Table("transactions t").Select("t.id, t.start_date, t.end_date, c.name AS pemesan").Joins("left join customers c on c.id = t.customer_id").Scan(&transactionRes)
+	result := db.Raw(`
+		SELECT
+			t.id, t.start_date, t.end_date, c.name AS pemesan,
+			(SELECT SUM(p.price) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan
+		FROM transactions t
+		LEFT JOIN customers c ON c.id = t.customer_id
+		WHERE t.is_active=?`, true).Scan(&transactionRes)
 	if result.Error != nil {
 		log.Println("err TransactionList")
 		log.Println(result.Error)

@@ -48,7 +48,7 @@ func TransactionDetail(id int) (Response, error) {
 	var transaction Transaction
 	db := config.GetDBInstance()
 
-	result := db.Where("is_active = ?", true).Preload("Customer").Preload("TransactionItems").First(&transaction, id)
+	result := db.Where("is_active = ?", true).Preload("Customer").Preload("TransactionItems").Preload("TransactionItems.Product").First(&transaction, id)
 	if result.Error != nil {
 		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
 			res.Status = http.StatusOK

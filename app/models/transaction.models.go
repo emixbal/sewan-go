@@ -23,6 +23,13 @@ type Transaction struct {
 	UpdatedAt        time.Time         `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
 }
 
+type PaymentSummary struct {
+	ID           int `json:"id"`
+	TotalTagihan int `json:"total_tagihan"`
+	TotalDibayar int `json:"total_dibayar"`
+	SisaTagihan  int `json:"sisa_tagihan"`
+}
+
 func TransactionNew(transaction *Transaction) (Response, error) {
 	var res Response
 	db := config.GetDBInstance()
@@ -44,11 +51,40 @@ func TransactionNew(transaction *Transaction) (Response, error) {
 }
 
 func TransactionDetail(id int) (Response, error) {
+	type TransactionDetailResponse struct {
+		Transaction interface{} `json:"transaction"`
+		Payment     interface{} `json:"payment"`
+	}
+
 	var res Response
+	var tdr TransactionDetailResponse
+	var payment_summary PaymentSummary
+
 	var transaction Transaction
 	db := config.GetDBInstance()
 
-	result := db.Where("is_active = ?", true).Preload("Customer").Preload("TransactionItems").Preload("TransactionItems.Product").First(&transaction, id)
+	result := db.Where("is_active = ?", true).
+		Preload("Customer").
+		Preload("TransactionItems").
+		Preload("TransactionItems.Product").First(&transaction, id)
+
+	res_qry := db.Raw(`SELECT
+			t.id AS transaksi_id,
+			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan,
+			(SELECT SUM(py.nominal) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
+			(SELECT (total_tagihan-total_dibayar)) AS sisa_tagihan
+		FROM transactions t
+		WHERE t.is_active= ?
+		AND t.id= ?
+		LIMIT 1`, true, id).Scan(&payment_summary)
+	if res_qry.Error != nil {
+		fmt.Println(res_qry.Error)
+		res.Status = http.StatusInternalServerError
+		res.Message = "err"
+
+		return res, nil
+	}
+
 	if result.Error != nil {
 		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
 			res.Status = http.StatusOK
@@ -60,9 +96,12 @@ func TransactionDetail(id int) (Response, error) {
 		res.Message = "Something went wrong!"
 		return res, result.Error
 	}
+	tdr.Transaction = transaction
+	tdr.Payment = payment_summary
+
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
-	res.Data = transaction
+	res.Data = tdr
 
 	return res, nil
 }
@@ -144,12 +183,6 @@ func TransactionList(limit, offset int) (Response, error) {
 }
 
 func TransactionAddPayment(payment *Payment) (Response, error) {
-	type PaymentSummary struct {
-		ID           int
-		TotalTagihan int
-		TotalDibayar int
-		SisaTagihan  int
-	}
 	var payment_summary PaymentSummary
 	var res Response
 	db := config.GetDBInstance()

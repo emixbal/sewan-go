@@ -142,3 +142,54 @@ func TransactionList(limit, offset int) (Response, error) {
 
 	return res, nil
 }
+
+func TransactionAddPayment(payment *Payment) (Response, error) {
+	type PaymentSummary struct {
+		ID           int
+		TotalTagihan int
+		TotalDibayar int
+		SisaTagihan  int
+	}
+	var payment_summary PaymentSummary
+	var res Response
+	db := config.GetDBInstance()
+
+	res_qry := db.Raw(`SELECT
+			t.id AS transaksi_id,
+			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan,
+			(SELECT SUM(py.nominal) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
+			(SELECT (total_tagihan-total_dibayar)) AS sisa_tagihan
+		FROM transactions t
+		WHERE t.is_active= ?
+		AND t.id= ?
+		LIMIT 1`, true, payment.TransactionID).Scan(&payment_summary)
+	if res_qry.Error != nil {
+		fmt.Println(res_qry.Error)
+		res.Status = http.StatusInternalServerError
+		res.Message = "err"
+
+		return res, nil
+	}
+
+	if payment.Nominal > payment_summary.SisaTagihan {
+		fmt.Println("payment.Nominal > payment_summary.SisaTagihan")
+		res.Status = http.StatusBadRequest
+		res.Message = "Terlalu banyak"
+
+		return res, nil
+	}
+
+	if result := db.Create(&payment); result.Error != nil {
+		fmt.Print("error TransactionAddPayment")
+		fmt.Print(result.Error)
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "error save new record"
+		return res, result.Error
+	}
+
+	res.Status = http.StatusOK
+	res.Message = config.SuccessMessage
+
+	return res, nil
+}

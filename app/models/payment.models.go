@@ -7,5 +7,5 @@ type Payment struct {
 	TransactionID uint `json:"transaction_id" gorm:"not null"`
 	Transaction   Transaction
 	Nominal       int       `json:"nominal"`
-	Date          time.Time `gorm:"not null" json:"date"`
+	CreatedAt     time.Time `json:"created_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
 }

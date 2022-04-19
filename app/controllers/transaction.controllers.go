@@ -86,3 +86,30 @@ func TransactionList(c *fiber.Ctx) error {
 	result, _ := models.TransactionList(limit, offset)
 	return c.Status(result.Status).JSON(result)
 }
+
+func TransactionAddPayment(c *fiber.Ctx) error {
+	var payment models.Payment
+	transaction_id, err_transaction_id := strconv.Atoi(c.Params("transaction_id"))
+	if err_transaction_id != nil {
+		log.Println(err_transaction_id)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
+	}
+
+	payload := struct {
+		Nominal int `json:"nominal"`
+	}{}
+
+	if err := c.BodyParser(&payload); err != nil {
+		return err
+	}
+
+	payment.Nominal = payload.Nominal
+	payment.TransactionID = uint(transaction_id)
+	if payment.Nominal < 1 {
+		log.Println("nominal is empty or invalid format")
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "nominal is empty or invalid format"})
+	}
+
+	result, _ := models.TransactionAddPayment(&payment)
+	return c.Status(result.Status).JSON(result)
+}

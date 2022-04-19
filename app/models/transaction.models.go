@@ -106,41 +106,6 @@ func TransactionDetail(id int) (Response, error) {
 	return res, nil
 }
 
-func TransactionShowItems(id int) (Response, error) {
-	type TransactionItemRes struct {
-		Id       int    `json:"id"`
-		Name     string `json:"name"`
-		Qty      int    `json:"qty"`
-		Price    int    `json:"price"`
-		SubTotal int    `json:"sub_total"`
-	}
-
-	var res Response
-	var arrTransactionItem []TransactionItemRes
-	var arrTransactionItemRes []TransactionItemRes
-	db := config.GetDBInstance()
-
-	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join products p on p.id = ti.product_id").Scan(&arrTransactionItem)
-	if result.Error != nil {
-		log.Println("err TransactionShowItems")
-		log.Println(result.Error)
-		res.Status = http.StatusInternalServerError
-		res.Message = "Something went wrong!"
-		return res, nil
-	}
-
-	for _, item := range arrTransactionItem {
-		item.SubTotal = item.Price * item.Qty
-		arrTransactionItemRes = append(arrTransactionItemRes, item)
-	}
-
-	res.Status = http.StatusOK
-	res.Message = config.SuccessMessage
-	res.Data = arrTransactionItemRes
-
-	return res, nil
-}
-
 func TransactionList(limit, offset int) (Response, error) {
 	type TransactionRes struct {
 		Id           int    `json:"id"`

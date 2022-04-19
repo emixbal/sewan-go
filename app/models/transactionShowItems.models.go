@@ -27,7 +27,11 @@ func TransactionShowItems(id int) (Response, error) {
 	var arrTransactionItemRes []TransactionItemRes
 	db := config.GetDBInstance()
 
-	result := db.Table("transaction_items ti").Select("ti.id, p.name, ti.qty, p.price").Joins("left join products p on p.id = ti.product_id").Scan(&arrTransactionItem)
+	result := db.Table("transaction_items ti").
+		Select("ti.id, p.name, ti.qty, p.price").
+		Joins("left join products p on p.id = ti.product_id").
+		Where("ti.transaction_id = ?", id).
+		Scan(&arrTransactionItem)
 	if result.Error != nil {
 		log.Println("err TransactionShowItems")
 		log.Println(result.Error)

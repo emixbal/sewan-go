@@ -98,7 +98,7 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 	tdapr.TransactionItems = transactionItems
 	tdapr.PaymentList = payments
 
-	res.Status = http.StatusInternalServerError
+	res.Status = http.StatusOK
 	res.Message = "err"
 	res.Data = tdapr
 

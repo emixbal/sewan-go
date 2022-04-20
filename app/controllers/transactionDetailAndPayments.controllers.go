@@ -18,5 +18,4 @@ func TransactionDetailAndPayments(c *fiber.Ctx) error {
 
 	result, _ := models.TransactionDetailAndPayments(transaction_id)
 	return c.Status(result.Status).JSON(result)
-
 }

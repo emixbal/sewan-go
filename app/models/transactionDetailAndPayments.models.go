@@ -99,7 +99,7 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 	tdapr.PaymentList = payments
 
 	res.Status = http.StatusOK
-	res.Message = "err"
+	res.Message = config.SuccessMessage
 	res.Data = tdapr
 
 	return res, nil

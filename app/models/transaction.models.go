@@ -78,7 +78,7 @@ func TransactionDetail(id int) (Response, error) {
 		AND t.id= ?
 		LIMIT 1`, true, id).Scan(&payment_summary)
 	if res_qry.Error != nil {
-		fmt.Println(res_qry.Error)
+		log.Println(res_qry.Error)
 		res.Status = http.StatusInternalServerError
 		res.Message = "err"
 

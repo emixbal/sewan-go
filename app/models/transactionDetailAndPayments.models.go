@@ -74,7 +74,7 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 	}
 
 	if r := db.Table("transaction_items ti").
-		Select("ti.id, p.name, ti.qty, p.price").
+		Select("ti.id, p.name, ti.qty, p.price, (ti.qty*p.price) as sub_total").
 		Joins("left join products p on p.id = ti.product_id").
 		Where("ti.transaction_id = ?", transaction_id).
 		Scan(&transactionItems); r.Error != nil {

@@ -14,6 +14,7 @@ func InitMigration(db *gorm.DB) {
 		&models.Transaction{},
 		&models.TransactionItem{},
 		&models.Payment{},
+		&models.StatusTransaction{},
 	)
 	InitSeeding(db)
 }

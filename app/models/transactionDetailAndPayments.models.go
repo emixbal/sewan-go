@@ -14,18 +14,19 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 		TransactionItems interface{} `json:"transaction_items"`
 		PaymentList      interface{} `json:"payment_list"`
 	}
+	type Detail struct {
+		Pemesan           string    `json:"pemesan"`
+		Address           string    `json:"address"`
+		Phone             string    `json:"phone"`
+		Email             string    `json:"email"`
+		StartDate         time.Time `json:"start_date"`
+		EndDate           time.Time `json:"end_date"`
+		StatusTransaction string    `json:"status_transaction"`
+	}
 	type PaymentSummary struct {
 		TotalTagihan int `json:"total_tagihan"`
 		TotalDibayar int `json:"total_dibayar"`
 		SisaTagihan  int `json:"sisa_tagihan"`
-	}
-	type Detail struct {
-		Pemesan   string    `json:"pemesan"`
-		Address   string    `json:"address"`
-		Phone     string    `json:"phone"`
-		Email     string    `json:"email"`
-		StartDate time.Time `json:"start_date"`
-		ENdDate   time.Time `json:"end_date"`
 	}
 	type TransactionItem struct {
 		Id       int    `json:"id"`
@@ -45,8 +46,12 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 	db := config.GetDBInstance()
 
 	if r := db.Table("transactions t").
-		Select("c.name AS pemesan, c.address, c.phone, c.email, t.start_date, t.end_date").
+		Select(`
+			c.name AS pemesan, c.address, c.phone, c.email, t.start_date, t.end_date,
+			(SELECT IF(st.name IS NULL or st.name = '', 'Default', st.name)) AS status_transaction
+		`).
 		Joins("left join customers c ON t.customer_id=c.id").
+		Joins("left join status_transactions st ON st.id=t.status_transaction_id").
 		Where("t.id = ?", transaction_id).Scan(&detail); r.Error != nil {
 
 		log.Println("TransactionDetailAndPayments detail")

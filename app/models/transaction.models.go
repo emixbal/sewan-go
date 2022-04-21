@@ -12,15 +12,17 @@ import (
 )
 
 type Transaction struct {
-	ID               uint `json:"id"`
-	IsActive         bool `json:"is_active,omitempty" gorm:"default:true"`
-	CustomerID       int  `json:"customer_id"`
-	Customer         Customer
-	TransactionItems []TransactionItem `json:"transaction_items"`
-	StartDate        time.Time         `gorm:"not null" json:"start_date"`
-	EndDate          time.Time         `gorm:"not null" json:"end_date"`
-	CreatedAt        time.Time         `json:"created_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
-	UpdatedAt        time.Time         `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
+	ID                  uint `json:"id"`
+	IsActive            bool `json:"is_active,omitempty" gorm:"default:true"`
+	CustomerID          int  `json:"customer_id"`
+	Customer            Customer
+	TransactionItems    []TransactionItem `json:"transaction_items"`
+	StartDate           time.Time         `gorm:"not null" json:"start_date"`
+	EndDate             time.Time         `gorm:"not null" json:"end_date"`
+	StatusTransaction   StatusTransaction
+	StatusTransactionID int       `json:"status_transaction_id"`
+	CreatedAt           time.Time `json:"created_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP" faker:"-"`
+	UpdatedAt           time.Time `json:"update_at" gorm:"type:DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" faker:"-"`
 }
 
 type PaymentSummary struct {

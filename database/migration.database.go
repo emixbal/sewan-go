@@ -19,10 +19,14 @@ func InitMigration(db *gorm.DB) {
 	InitSeeding(db)
 }
 func InitSeeding(db *gorm.DB) {
-	var userCount int64
-	db.Model(&models.User{}).Count(&userCount)
-	if userCount == 0 {
+	var count int64
+	db.Model(&models.User{}).Count(&count)
+	if count == 0 {
 		UserSeeder(db)
+	}
+	db.Model(&models.StatusTransaction{}).Count(&count)
+	if count == 0 {
+		StatusTransactionSeeder(db)
 	}
 }
 func UserSeeder(db *gorm.DB) {
@@ -35,4 +39,22 @@ func UserSeeder(db *gorm.DB) {
 		},
 	}
 	db.Create(&user)
+}
+
+func StatusTransactionSeeder(db *gorm.DB) {
+	status_transaction := []models.StatusTransaction{
+		{
+			Name: "Default",
+		},
+		{
+			Name: "Dikirim",
+		},
+		{
+			Name: "Ada kerusakan/kehilangan",
+		},
+		{
+			Name: "Selesai & Dikembalikan",
+		},
+	}
+	db.Create(&status_transaction)
 }

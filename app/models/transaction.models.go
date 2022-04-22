@@ -193,3 +193,40 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 
 	return res, nil
 }
+
+func TransactionChangeSendStatus(transaction_id int) (Response, error) {
+	var res Response
+	var transaction Transaction
+
+	db := config.GetDBInstance()
+	result := db.Where("id = ?", transaction_id).Take(&transaction)
+	if result.Error != nil {
+		if is_notfound := errors.Is(result.Error, gorm.ErrRecordNotFound); is_notfound {
+			res.Status = http.StatusOK
+			res.Message = "can't find record"
+			return res, result.Error
+		}
+
+		log.Println("TransactionChangeSendStatus find err")
+		log.Println(result.Error)
+
+		res.Status = http.StatusInternalServerError
+		res.Message = "something went wrong"
+		return res, result.Error
+	}
+
+	transaction.StatusTransactionID = 2
+
+	if r := db.Save(&transaction); r.Error != nil {
+		log.Println("TransactionChangeSendStatus update status err")
+		log.Println(r.Error)
+		res.Status = http.StatusInternalServerError
+		res.Message = "error update status"
+		return res, result.Error
+	}
+
+	res.Status = http.StatusOK
+	res.Message = config.SuccessMessage
+
+	return res, nil
+}

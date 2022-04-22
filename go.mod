@@ -15,5 +15,6 @@ require (
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/sys v0.0.0-20211102192858-4dd72447c267 // indirect
 	gorm.io/driver/mysql v1.1.3
-	gorm.io/gorm v1.22.2
+	gorm.io/driver/postgres v1.3.4
+	gorm.io/gorm v1.23.1
 )

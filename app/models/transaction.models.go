@@ -150,11 +150,29 @@ func TransactionList(limit, offset int) (Response, error) {
 }
 
 func TransactionAddPayment(payment *Payment) (Response, error) {
+	type TransactionAddPaymentResponse struct {
+		Detail         interface{} `json:"transaction_detail"`
+		PaymentSummary interface{} `json:"payment_sumamry"`
+	}
+
+	type Detail struct {
+		ID                string    `json:"id"`
+		Pemesan           string    `json:"pemesan"`
+		Address           string    `json:"address"`
+		Phone             string    `json:"phone"`
+		Email             string    `json:"email"`
+		StartDate         time.Time `json:"start_date"`
+		EndDate           time.Time `json:"end_date"`
+		StatusTransaction string    `json:"status_transaction"`
+	}
+
+	var tapr TransactionAddPaymentResponse
+	var detail Detail
 	var payment_summary PaymentSummary
 	var res Response
 	db := config.GetDBInstance()
 
-	res_qry := db.Raw(`SELECT
+	if res_qry := db.Raw(`SELECT
 			t.id AS transaksi_id,
 			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan,
 			(SELECT SUM(py.nominal) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
@@ -162,8 +180,7 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 		FROM transactions t
 		WHERE t.is_active= ?
 		AND t.id= ?
-		LIMIT 1`, true, payment.TransactionID).Scan(&payment_summary)
-	if res_qry.Error != nil {
+		LIMIT 1`, true, payment.TransactionID).Scan(&payment_summary); res_qry.Error != nil {
 		fmt.Println(res_qry.Error)
 		res.Status = http.StatusInternalServerError
 		res.Message = "err"
@@ -188,8 +205,45 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 		return res, result.Error
 	}
 
+	if r := db.Table("transactions t").
+		Select(`
+			t.id,
+			c.name AS pemesan, c.address, c.phone, c.email, t.start_date, t.end_date,
+			(SELECT IF(st.name IS NULL or st.name = '', 'Default', st.name)) AS status_transaction
+		`).
+		Joins("left join customers c ON t.customer_id=c.id").
+		Joins("left join status_transactions st ON st.id=t.status_transaction_id").
+		Where("t.id = ?", payment.TransactionID).Scan(&detail); r.Error != nil {
+
+		log.Println("TransactionDetailAndPayments detail")
+		log.Println(r.Error)
+		res.Status = http.StatusInternalServerError
+		res.Message = "err"
+		return res, r.Error
+	}
+
+	if res_qry := db.Raw(`SELECT
+			t.id AS transaksi_id,
+			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan,
+			(SELECT SUM(py.nominal) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
+			(SELECT (total_tagihan-total_dibayar)) AS sisa_tagihan
+		FROM transactions t
+		WHERE t.is_active= ?
+		AND t.id= ?
+		LIMIT 1`, true, payment.TransactionID).Scan(&payment_summary); res_qry.Error != nil {
+		fmt.Println(res_qry.Error)
+		res.Status = http.StatusInternalServerError
+		res.Message = "err"
+
+		return res, nil
+	}
+
+	tapr.PaymentSummary = payment_summary
+	tapr.Detail = detail
+
 	res.Status = http.StatusOK
 	res.Message = config.SuccessMessage
+	res.Data = tapr
 
 	return res, nil
 }

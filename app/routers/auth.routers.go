@@ -17,5 +17,4 @@ func Auth(app *fiber.App) {
 
 	r.Post("/login-n", controllers.UserLogin)
 	r.Post("/refresh", controllers.RefreshToken)
-
 }

@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"sewan-go/config"
@@ -37,8 +36,8 @@ func TransactionNew(transaction *Transaction) (Response, error) {
 	db := config.GetDBInstance()
 
 	if result := db.Create(&transaction); result.Error != nil {
-		fmt.Print("error CreateATransaction")
-		fmt.Print(result.Error)
+		log.Print("error CreateATransaction")
+		log.Print(result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error save new record"
@@ -175,13 +174,13 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 	if res_qry := db.Raw(`SELECT
 			t.id AS transaksi_id,
 			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan,
-			(SELECT SUM(py.nominal) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
+			(SELECT IF(SUM(py.nominal) IS NULL OR SUM(py.nominal)='', 0, SUM(py.nominal)) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
 			(SELECT (total_tagihan-total_dibayar)) AS sisa_tagihan
 		FROM transactions t
 		WHERE t.is_active= ?
 		AND t.id= ?
 		LIMIT 1`, true, payment.TransactionID).Scan(&payment_summary); res_qry.Error != nil {
-		fmt.Println(res_qry.Error)
+		log.Println(res_qry.Error)
 		res.Status = http.StatusInternalServerError
 		res.Message = "err"
 
@@ -189,7 +188,9 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 	}
 
 	if payment.Nominal > payment_summary.SisaTagihan {
-		fmt.Println("payment.Nominal > payment_summary.SisaTagihan")
+		log.Println("payment.Nominal", payment.Nominal)
+		log.Println("payment_summary.SisaTagihan", payment_summary.SisaTagihan)
+		log.Println("payment.Nominal > payment_summary.SisaTagihan")
 		res.Status = http.StatusBadRequest
 		res.Message = "Terlalu banyak"
 
@@ -197,8 +198,8 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 	}
 
 	if result := db.Create(&payment); result.Error != nil {
-		fmt.Print("error TransactionAddPayment")
-		fmt.Print(result.Error)
+		log.Print("error TransactionAddPayment")
+		log.Print(result.Error)
 
 		res.Status = http.StatusInternalServerError
 		res.Message = "error save new record"
@@ -231,7 +232,7 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 		WHERE t.is_active= ?
 		AND t.id= ?
 		LIMIT 1`, true, payment.TransactionID).Scan(&payment_summary); res_qry.Error != nil {
-		fmt.Println(res_qry.Error)
+		log.Println(res_qry.Error)
 		res.Status = http.StatusInternalServerError
 		res.Message = "err"
 

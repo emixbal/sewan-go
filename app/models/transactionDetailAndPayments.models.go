@@ -15,6 +15,7 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 		PaymentList      interface{} `json:"payment_list"`
 	}
 	type Detail struct {
+		ID                string    `json:"id"`
 		Pemesan           string    `json:"pemesan"`
 		Address           string    `json:"address"`
 		Phone             string    `json:"phone"`
@@ -47,6 +48,7 @@ func TransactionDetailAndPayments(transaction_id int) (Response, error) {
 
 	if r := db.Table("transactions t").
 		Select(`
+			t.id,
 			c.name AS pemesan, c.address, c.phone, c.email, t.start_date, t.end_date,
 			(SELECT IF(st.name IS NULL or st.name = '', 'Default', st.name)) AS status_transaction
 		`).

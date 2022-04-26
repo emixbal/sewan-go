@@ -24,4 +24,5 @@ func Transaction(app *fiber.App) {
 	r.Put("/item/:item_id", controllers.TransactionItemUpdateQty)
 
 	r.Post("/:transaction_id/add-demage", controllers.TransactionAddDemage)
+	r.Get("/:transaction_id/list-demage", controllers.TransactionListDemage)
 }

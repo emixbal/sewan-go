@@ -285,3 +285,35 @@ func TransactionChangeStatus(transaction_id int, status int) (Response, error) {
 
 	return res, nil
 }
+
+func TransactionListDemage(transaction_id int) (Response, error) {
+	type ListDemagesRes struct {
+		Id           int    `json:"id"`
+		ProductName  string `json:"product_name"`
+		Qty          string `json:"qty"`
+		ProductPrice string `json:"product_price"`
+		SubTotal     string `json:"sub_total"`
+	}
+
+	var res Response
+	var lsit_demages []ListDemagesRes
+
+	db := config.GetDBInstance()
+	if result := db.Table("demages d").
+		Select("d.id, p.name AS product_name, d.qty AS qty, p.price AS product_price, (SELECT(d.qty * p.price)) AS sub_total").
+		Joins("left join products p on p.id = d.product_id").
+		Where("d.transaction_id = ?", transaction_id).
+		Scan(&lsit_demages); result.Error != nil {
+		log.Println("err TransactionShowItems")
+		log.Println(result.Error)
+		res.Status = http.StatusInternalServerError
+		res.Message = "Something went wrong!"
+		return res, nil
+	}
+
+	res.Message = config.SuccessMessage
+	res.Status = http.StatusOK
+	res.Data = lsit_demages
+
+	return res, nil
+}

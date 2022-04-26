@@ -151,30 +151,26 @@ func TransactionAddDemage(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
 	}
 
-	// payload := []struct {
-	// 	ProductID int `json:"product_id"`
-	// 	Qty       int `json:"qty"`
-	// }{}
-
 	payload := []models.DemagePayload{}
 
 	if err := c.BodyParser(&payload); err != nil {
 		log.Println("err payload slice", err)
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
-			"message": "err",
+			"message": err,
 		})
 	}
 
-	// var arrDemage []models.DemagePayload
-	// var temp models.DemagePayload
-
-	// for _, data := range payload {
-	// 	temp.ProductID = data.ProductID
-	// 	temp.Qty = data.Qty
-
-	// 	arrDemage = append(arrDemage, temp)
-	// }
-
 	result, _ := models.TransactionAddDemage(transaction_id, payload)
+	return c.Status(result.Status).JSON(result)
+}
+
+func TransactionListDemage(c *fiber.Ctx) error {
+	transaction_id, err_transaction_id := strconv.Atoi(c.Params("transaction_id"))
+	if err_transaction_id != nil {
+		log.Println(err_transaction_id)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
+	}
+
+	result, _ := models.TransactionListDemage(transaction_id)
 	return c.Status(result.Status).JSON(result)
 }

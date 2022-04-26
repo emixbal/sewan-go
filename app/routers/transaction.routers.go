@@ -16,6 +16,8 @@ func Transaction(app *fiber.App) {
 	r.Get("/:transaction_id/items", controllers.TransactionShowItems)
 	r.Get("/:transaction_id/payment", controllers.TransactionDetailAndPayments)
 	r.Put("/:transaction_id/send", controllers.TransactionChangeSendStatus)
+	r.Put("/:transaction_id/return/nok", controllers.TransactionChangeReturnStatusNOK)
+	r.Put("/:transaction_id/return/ok", controllers.TransactionChangeReturnStatusOK)
 	r.Post("/:transaction_id/add-items", controllers.AddItemToTransaction)
 	r.Post("/:transaction_id/payment", controllers.TransactionAddPayment)
 	r.Delete("/item/:item_id", controllers.TransactionItemDelete)

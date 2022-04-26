@@ -120,6 +120,26 @@ func TransactionChangeSendStatus(c *fiber.Ctx) error {
 		log.Println(err_transaction_id)
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
 	}
-	result, _ := models.TransactionChangeSendStatus(transaction_id)
+	result, _ := models.TransactionChangeStatus(transaction_id, 2)
+	return c.Status(result.Status).JSON(result)
+}
+
+func TransactionChangeReturnStatusNOK(c *fiber.Ctx) error {
+	transaction_id, err_transaction_id := strconv.Atoi(c.Params("transaction_id"))
+	if err_transaction_id != nil {
+		log.Println(err_transaction_id)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
+	}
+	result, _ := models.TransactionChangeStatus(transaction_id, 3)
+	return c.Status(result.Status).JSON(result)
+}
+
+func TransactionChangeReturnStatusOK(c *fiber.Ctx) error {
+	transaction_id, err_transaction_id := strconv.Atoi(c.Params("transaction_id"))
+	if err_transaction_id != nil {
+		log.Println(err_transaction_id)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"message": "transaction_id is empty or invalid format"})
+	}
+	result, _ := models.TransactionChangeStatus(transaction_id, 4)
 	return c.Status(result.Status).JSON(result)
 }

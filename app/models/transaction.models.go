@@ -249,7 +249,7 @@ func TransactionAddPayment(payment *Payment) (Response, error) {
 	return res, nil
 }
 
-func TransactionChangeSendStatus(transaction_id int) (Response, error) {
+func TransactionChangeStatus(transaction_id int, status int) (Response, error) {
 	var res Response
 	var transaction Transaction
 
@@ -270,7 +270,7 @@ func TransactionChangeSendStatus(transaction_id int) (Response, error) {
 		return res, result.Error
 	}
 
-	transaction.StatusTransactionID = 2
+	transaction.StatusTransactionID = status
 
 	if r := db.Save(&transaction); r.Error != nil {
 		log.Println("TransactionChangeSendStatus update status err")

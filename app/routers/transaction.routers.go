@@ -22,4 +22,6 @@ func Transaction(app *fiber.App) {
 	r.Post("/:transaction_id/payment", controllers.TransactionAddPayment)
 	r.Delete("/item/:item_id", controllers.TransactionItemDelete)
 	r.Put("/item/:item_id", controllers.TransactionItemUpdateQty)
+
+	r.Post("/:transaction_id/add-demage", controllers.TransactionAddDemage)
 }

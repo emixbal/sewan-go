@@ -75,6 +75,7 @@ func TransactionCustomerNew(c *fiber.Ctx) error {
 	transaction.StartDate = start_date
 	transaction.EndDate = end_date
 	transaction.CustomerID = int(result.CustomerId) // data from customer id
+	transaction.StatusTransactionID = 1
 
 	result_trx, _ := models.TransactionNew(&transaction)
 	return c.Status(result_trx.Status).JSON(result_trx)

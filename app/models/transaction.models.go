@@ -109,13 +109,14 @@ func TransactionDetail(id int) (Response, error) {
 
 func TransactionList(limit, offset int) (Response, error) {
 	type TransactionRes struct {
-		Id           int    `json:"id"`
-		StartDate    string `json:"start_date"`
-		EndDate      string `json:"end_date"`
-		Pemesan      string `json:"pemesan"`
-		TotalTagihan uint   `json:"total_tagihan"`
-		TotalDibayar uint   `json:"total_dibayar"`
-		SisaTagihan  uint   `json:"sisa_tagihan"`
+		Id                int    `json:"id"`
+		StartDate         string `json:"start_date"`
+		EndDate           string `json:"end_date"`
+		Pemesan           string `json:"pemesan"`
+		StatusTransaction string `json:"status_transaction"`
+		TotalTagihan      uint   `json:"total_tagihan"`
+		TotalDibayar      uint   `json:"total_dibayar"`
+		SisaTagihan       uint   `json:"sisa_tagihan"`
 	}
 
 	var transactionRes []TransactionRes
@@ -126,6 +127,7 @@ func TransactionList(limit, offset int) (Response, error) {
 	result := db.Raw(`
 		SELECT
 			t.id, t.start_date, t.end_date, c.name AS pemesan,
+			(SELECT st.name FROM status_transactions st WHERE st.id = t.status_transaction_id) AS status_transaction,
 			(SELECT SUM(p.price*ti.qty) FROM transaction_items ti JOIN products p WHERE ti.product_id=p.id AND ti.transaction_id=t.id) AS total_tagihan,
 			(SELECT SUM(py.nominal) FROM payments py WHERE py.transaction_id=t.id) AS total_dibayar,
 			(SELECT (total_tagihan-total_dibayar)) AS sisa_tagihan
